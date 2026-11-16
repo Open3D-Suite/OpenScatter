@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<ApplicationPackage
+    SchemaVersion="1.0"
+    AutodeskProduct="3ds Max"
+    ProductType="Application"
+    Name="OpenScatter"
+    Description="Open-source scatter for 3ds Max: millions of render-time instances on surfaces."
+    AppVersion="0.1.0"
+    ProductCode="{9599CC1B-5744-409A-9381-3B0CA83CED22}"
+    UpgradeCode="{7019081D-BDB9-4ADD-A475-4B73A4733340}">
+    <CompanyDetails Name="OpenScatter contributors" />
+    <RuntimeRequirements OS="Win64" Platform="3ds Max" SeriesMin="2027" SeriesMax="2027" />
+    <!-- One component per 3ds Max version: a plugin built for one version does not load in another. -->
+    <Components Description="plugins parts">
+        <RuntimeRequirements OS="Win64" Platform="3ds Max" SeriesMin="2027" SeriesMax="2027" />
+        <ComponentEntry AppName="OpenScatter" Version="0.1.0" ModuleName="./Contents/plugins/2027/OpenScatter.dlo" />
+    </Components>
+</ApplicationPackage>

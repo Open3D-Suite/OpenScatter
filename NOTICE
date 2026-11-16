@@ -1,0 +1,31 @@
+OpenScatter
+Copyright (C) 2026 the OpenScatter authors
+Licensed under the GNU General Public License, version 3 or later (see LICENSE).
+
+OpenScatter is written from scratch. It learns from the behaviour of existing scatters for 3ds Max
+as their public documentation describes it; it is not affiliated with their makers and contains
+none of their code, names, icons, patterns, distribution maps, presets or assets.
+
+Algorithms
+
+  The blue-noise patterns are built by weighted sample elimination, as described in:
+  Cem Yuksel, "Sample Elimination for Generating Poisson Disk Sample Sets", Computer Graphics Forum
+  (Proceedings of Eurographics), 2015. The implementation (core/src/pattern.cpp) was written for
+  OpenScatter.
+
+  The hash functions (core/include/osc/hash.h) are built on the SplitMix64 finaliser, which its
+  author, Sebastiano Vigna, placed in the public domain.
+
+Third-party software
+
+  doctest 2.5.3 - https://github.com/doctest/doctest
+  Copyright (c) 2016-2023 Viktor Kirilov. MIT License: third_party/doctest/LICENSE.txt.
+  Used by the tests only; it is not part of the library or of anything OpenScatter installs.
+
+The 3ds Max plugin
+
+  The plugin (plugin/) is written for OpenScatter against the programming interfaces of the
+  Autodesk 3ds Max SDK, which is needed to build it and is not part of this repository. It contains
+  no code of the SDK or of its samples. Autodesk and 3ds Max are trademarks of Autodesk, Inc.;
+  Arnold, Corona and V-Ray are trademarks of their owners. OpenScatter is not affiliated with any
+  of them.

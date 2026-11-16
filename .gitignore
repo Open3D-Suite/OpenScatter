@@ -1,0 +1,14 @@
+# Build output (build.ps1 uses this folder unless told otherwise)
+/build/
+
+# Local build settings: paths on one machine (see README, "Building")
+/build.local.ps1
+/CMakeUserPresets.json
+
+# Editors
+/.vs/
+/.vscode/
+*.user
+
+# What the plugin tests write: results and captures of one run on one machine
+/tests/plugin/results/
