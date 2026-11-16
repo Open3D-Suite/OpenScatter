@@ -415,9 +415,9 @@ instances small enough not to pile up):
 
 | Instances | Scatter | Arnold, instancing interface | Corona 16, Particle Flow |
 |---|---|---|---|
-| 51 605 | 0.04 s | 0.9 s, +8 MB | 1.4 s, +28 MB |
-| 515 996 | 0.08 s | 1.0 s, +270 MB | 5.5 s, +600 MB |
-| 1 032 086 | 0.10 s | 1.1 s, +320 MB | 9.5 s, +630 MB |
+| 51 605 | 0.04 s | 0.8 s, +23 MB | 1.5 s, +33 MB |
+| 515 996 | 0.09 s | 1.0 s, +264 MB | 5.4 s, +601 MB |
+| 1 032 086 | 0.11 s | 1.1 s, +325 MB | 9.8 s, +617 MB |
 
 The times are whole renders, the renderer's start-up included; the memory is the growth of the
 process's peak.

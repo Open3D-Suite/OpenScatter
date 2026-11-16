@@ -66,6 +66,9 @@ function Invoke-Batch([string]$script, [hashtable]$environment = @{}, [bool]$wit
         return $false
     }
     Write-Host ("    {0}{1}: exit code {2}, {3:N0} s" -f $script, $tag, $p.ExitCode, ((Get-Date) - $started).TotalSeconds)
+    # The verdict is in the result file. An exit code other than 0 is shown because it may mean that
+    # 3ds Max did not shut down cleanly after the script had finished.
+    if ($p.ExitCode -ne 0) { Write-Host "    WARNING: $script$tag left exit code $($p.ExitCode); its console output is in $out" }
     foreach ($key in $environment.Keys) { Remove-Item -Path "Env:$key" -ErrorAction SilentlyContinue }
     return $true
 }
