@@ -2,11 +2,12 @@
 
 What changed for users in each version of OpenScatter, newest first.
 
-## In development
+## 0.1.0 — 16 November 2026
 
-There is no release yet. OpenScatter is being built from its engine outwards: the engine exists,
-and now so does a first version of the 3ds Max plugin around it – without an interface so far, so
-it is driven from MAXScript or Python and has to be built from source.
+The first release, and an early one. OpenScatter is being built from its engine outwards: the
+engine is there, and so is a first version of the 3ds Max plugin around it – **without an
+interface so far**, so every setting is made from MAXScript or Python. Rendering is tested in
+Arnold and in Corona 16; **V-Ray has not been tested**.
 
 **The 3ds Max plugin (3ds Max 2027)**
 
@@ -37,8 +38,9 @@ it is driven from MAXScript or Python and has to be built from source.
 - **Scenes survive without the plugin.** A scene opened in a 3ds Max that does not have
   OpenScatter keeps the object as a stand-in, renders nothing of it, and gets it back – settings,
   instances and all – when opened again with the plugin, even after being saved without it.
-- **One bundle.** The build puts together `OpenScatter.bundle`, the package 3ds Max loads from its
-  ApplicationPlugins folder.
+- **One bundle.** OpenScatter ships as `OpenScatter.bundle`, the package 3ds Max loads from its
+  ApplicationPlugins folder. The Open3D launcher installs, updates and removes it; by hand, copy
+  it there from the release's zip.
 
 Not there yet in the plugin: the interface in the Modify panel, areas and density maps (the engine
 has them), models made of several objects, proxies, per-instance colour and motion blur.

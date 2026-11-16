@@ -5,10 +5,32 @@ trees, stones, anything – and hands them to the renderer as real instances, wi
 nodes. Part of the [Open3D](https://github.com/carlesllavata/Open3D) suite of open-source tools
 for 3D work.
 
-**In development – there is no release to install yet.** OpenScatter is being built from its
-engine outwards. The engine exists and is tested. A first version of the 3ds Max plugin exists
-too: it scatters, renders and draws in the viewport, but it has no interface yet – it is driven
-from MAXScript or Python – and it has to be built from source.
+**Version 0.1.0 is the first release, and an early one.** OpenScatter is being built from its
+engine outwards. The engine and a first version of the 3ds Max plugin are there and tested: it
+scatters, renders in Arnold and Corona and draws in the viewport. But the plugin has **no
+interface yet** – there are no rollouts, and every setting is made from MAXScript or Python – and
+it has **not been tested in V-Ray**.
+
+## Install
+
+OpenScatter needs **3ds Max 2027** on Windows.
+
+The easy way: install the [Open3D Launcher](https://github.com/carlesllavata/Open3D/releases/latest)
+and click **Install** next to OpenScatter, with 3ds Max closed. It puts OpenScatter in
+`%APPDATA%\Autodesk\ApplicationPlugins` as a plug-in bundle, tells you when a new version is out
+and updates it. To uninstall, choose **Uninstall…** in OpenScatter's menu in the launcher.
+
+By hand: each [release](https://github.com/carlesllavata/OpenScatter/releases/latest) has the
+bundle as a zip, `openscatter-<version>-windows-x64-3dsmax.zip`. With 3ds Max closed, unzip it,
+copy the `OpenScatter.bundle` folder into `%APPDATA%\Autodesk\ApplicationPlugins\` and start
+3ds Max. To remove it, delete that folder with 3ds Max closed.
+
+Once it is installed, **OpenScatter** is in the Create panel, under Geometry, in the category
+Open3D, and it is the `OpenScatter` class in MAXScript.
+
+Every computer that renders a scene needs OpenScatter too. A 3ds Max without it still opens the
+scene and keeps the object, with its settings, for the day the plugin is there again – but it
+renders nothing of it.
 
 ## Where it is going
 
@@ -187,6 +209,9 @@ variable the SDK's installer sets. The result is `build\release\bundle\OpenScatt
 Nothing is installed: to use the bundle, copy that folder into
 `%APPDATA%\Autodesk\ApplicationPlugins` and start 3ds Max; to remove it, delete the folder.
 
+`python tools/package.py` does that build and writes the package a release carries to `dist\`:
+`OpenScatter.bundle` with the licence texts in it and, with `--zip`, the zip of that folder.
+
 ## Tests
 
 - The engine: `osc_core_tests`, run by `build.ps1`. No 3ds Max needed.
@@ -206,7 +231,7 @@ Nothing is installed: to use the bundle, copy that folder into
 | `core/` | The engine: `include/osc/` is its interface, `src/` its implementation. |
 | `plugin/` | The 3ds Max plugin: the object, its outputs to the renderers and the viewport. |
 | `bundle/` | The description of the package 3ds Max loads; the build adds the plugin to it. |
-| `tools/` | `tilegen` (pattern generator) and `bench` (benchmark). |
+| `tools/` | `tilegen` (pattern generator), `bench` (benchmark) and `package.py` (the release package). |
 | `tests/` | `core`: the tests of the engine ([doctest](https://github.com/doctest/doctest)). `plugin`: the tests of the plugin, in 3ds Max. |
 | `docs/` | [`ARCHITECTURE.md`](docs/ARCHITECTURE.md): how it is designed and why. |
 | `third_party/` | doctest, used by the engine's tests only. |

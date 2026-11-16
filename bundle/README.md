@@ -19,6 +19,9 @@ another; only 2027 exists so far). The version is written in `CMakeLists.txt`, w
 into the file properties of the `.dlo`, and twice in `PackageContents.xml`; the build refuses to
 put a bundle together when they disagree.
 
+`tools/package.py` makes the package a release carries from it: `dist\OpenScatter.bundle`, the
+same folder with `LICENSE` and `NOTICE` added.
+
 To use a bundle, copy the `OpenScatter.bundle` folder into an ApplicationPlugins folder
 (`%APPDATA%\Autodesk\ApplicationPlugins` for one user) and start 3ds Max. To try one without
 installing anything, point the environment variable `ADSK_APPLICATION_PLUGINS` at the folder that
