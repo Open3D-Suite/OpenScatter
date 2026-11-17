@@ -62,6 +62,8 @@ public:
 
 NodeValidator g_nodeValidator;
 
+// The two tables below are laid out by hand, one entry after another: clang-format leaves them alone.
+// clang-format off
 ParamBlockDesc2 g_scatterParams(
     kScatterParamBlock, _T("params"), 0, &g_scatterDesc, P_AUTO_CONSTRUCT, 0,
 
@@ -190,6 +192,7 @@ FPInterfaceDesc g_scatterInterface(
         _T("index"), 0, TYPE_INDEX,
     IOpenScatter::kFnGetVersion, _T("getVersion"), 0, TYPE_TSTR_BV, 0, 0,
     p_end);
+// clang-format on
 
 // The pattern every scatter object tiles: the one "osc_tilegen" writes with its default arguments.
 // Built once per session (about 0.1 s) on first use; it will come from a file in the bundle when

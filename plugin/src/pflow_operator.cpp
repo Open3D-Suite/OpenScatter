@@ -190,12 +190,15 @@ public:
 
 OpenScatterOperatorDesc g_operatorDesc;
 
+// A table laid out by hand: clang-format leaves it alone.
+// clang-format off
 ParamBlockDesc2 g_operatorParams(
     kOperatorParamBlock, _T("Parameters"), 0, &g_operatorDesc, P_AUTO_CONSTRUCT, 0,
 
     kOpScatter, _T("scatter"), TYPE_INODE, 0, 0,
         p_end,
     p_end);
+// clang-format on
 
 // Does the renderer draw this node at all?
 bool nodeRenders(INode* node)
