@@ -1,0 +1,9 @@
+# OpenScatter C++ style: Microsoft, lines of up to 120.
+BasedOnStyle: Microsoft
+ColumnLimit: 120
+# The order of the includes matters with the 3ds Max SDK headers.
+SortIncludes: Never
+# The code writes "Type* name" and "{ a, b }". The Microsoft style does not set either: it takes clang-format's
+# defaults ("Type *name", "{a, b}"). These two lines keep the code as it is written.
+PointerAlignment: Left
+Cpp11BracedListStyle: false

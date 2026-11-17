@@ -1,0 +1,2 @@
+# Third-party code is not formatted. One line per folder: clang-format 19 does not know "**".
+third_party/doctest/*
