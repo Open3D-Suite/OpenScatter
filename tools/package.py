@@ -40,7 +40,9 @@ def build(max_sdk):
     cmd = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(ROOT / "build.ps1"), "-Plugin"]
     if max_sdk:
         cmd += ["-MaxSdk", max_sdk]
-    result = subprocess.run(
+    # S603: running the build is what this script is for. The command is this repository's own build.ps1
+    # with a fixed argument list and no shell; the SDK folder is the one given to this script.
+    result = subprocess.run(  # noqa: S603
         cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors="replace"
     )
     found = re.search(r"^Bundle \(([0-9.]+)\): (.+)$", result.stdout, re.MULTILINE)
