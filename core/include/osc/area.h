@@ -21,7 +21,7 @@ namespace osc
 struct Polyline
 {
     std::vector<Vec2> points;
-    bool closed = true;   // closed: the last point joins the first and the shape has an inside
+    bool closed = true; // closed: the last point joins the first and the shape has an inside
 };
 
 enum class AreaMode
@@ -50,27 +50,36 @@ struct Area
 // number of threads.
 class AreaSet
 {
-public:
+  public:
     AreaSet() = default;
     explicit AreaSet(const std::vector<Area>& areas);
 
     // No areas at all: weight() is 1 everywhere.
-    bool empty() const { return m_areas.empty(); }
+    bool empty() const
+    {
+        return m_areas.empty();
+    }
 
-    bool hasIncludes() const { return m_includes > 0; }
+    bool hasIncludes() const
+    {
+        return m_includes > 0;
+    }
 
     // A rectangle outside which no include area has any effect. Empty when hasIncludes() is false,
     // and also when the include areas enclose nothing (then nothing is included anywhere).
-    const Rect& includeBounds() const { return m_includeBounds; }
+    const Rect& includeBounds() const
+    {
+        return m_includeBounds;
+    }
 
     // The share of the density that remains at (x, y): 0 = no instances, 1 = untouched.
     float weight(float x, float y) const;
 
-private:
+  private:
     struct Edge
     {
         float ax, ay, bx, by;
-        std::uint32_t closed;   // 1: part of a closed shape; 0: part of an open one
+        std::uint32_t closed; // 1: part of a closed shape; 0: part of an open one
     };
 
     struct Compiled
@@ -86,11 +95,11 @@ private:
         // The grid: everything the area can affect. Outside it the weight is 0.
         double minX = 0.0, minY = 0.0, maxX = 0.0, maxY = 0.0;
         std::size_t nx = 0, ny = 0;
-        double scaleX = 0.0, scaleY = 0.0;        // cells per unit
+        double scaleX = 0.0, scaleY = 0.0; // cells per unit
         std::vector<Edge> edges;
-        std::vector<std::uint32_t> cellStart;     // per cell, the edges close enough to matter there
+        std::vector<std::uint32_t> cellStart; // per cell, the edges close enough to matter there
         std::vector<std::uint32_t> cellEdges;
-        std::vector<std::uint8_t> cellInside;     // whether the centre of the cell is inside
+        std::vector<std::uint8_t> cellInside; // whether the centre of the cell is inside
 
         // Bands in Y for the inside test: the closed edges that cross each band.
         std::size_t rows = 0;
@@ -103,7 +112,7 @@ private:
         float weight(double x, double y) const;
     };
 
-    std::vector<Compiled> m_areas;   // the include areas first
+    std::vector<Compiled> m_areas; // the include areas first
     std::size_t m_includes = 0;
     Rect m_includeBounds;
 };

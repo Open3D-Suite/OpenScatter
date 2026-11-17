@@ -63,7 +63,7 @@ TEST_CASE("scatter: what cannot be scattered says why")
     }
     {
         osc::ScatterSettings bad = s;
-        bad.domain = osc::Rect{};   // no rectangle, no surface, no include area
+        bad.domain = osc::Rect{}; // no rectangle, no surface, no include area
         const osc::ScatterResult r = osc::scatterPlanar(pattern, bad);
         CHECK(r.status == ScatterStatus::NoDomain);
         CHECK(r.count() == 0);
@@ -72,16 +72,17 @@ TEST_CASE("scatter: what cannot be scattered says why")
         osc::ScatterSettings bad = s;
         bad.tileSize = 0.001f;
         bad.density = osc::patternDensity(pattern.size(), bad.tileSize);
-        bad.domain = { 0.0f, 0.0f, 1000.0f, 1000.0f };   // a million million tiles
+        bad.domain = { 0.0f, 0.0f, 1000.0f, 1000.0f }; // a million million tiles
         const osc::ScatterResult r = osc::scatterPlanar(pattern, bad);
         CHECK(r.status == ScatterStatus::TooManyTiles);
         CHECK(r.tiles.empty());
         bad = s;
-        bad.domain = { -1e30f, -1e30f, 1e30f, 1e30f };   // more tiles than a number can count
+        bad.domain = { -1e30f, -1e30f, 1e30f, 1e30f }; // more tiles than a number can count
         CHECK(osc::scatterPlanar(pattern, bad).status == ScatterStatus::TooManyTiles);
     }
-    for (const ScatterStatus status : { ScatterStatus::Ok, ScatterStatus::EmptyPattern, ScatterStatus::InvalidSettings,
-                                        ScatterStatus::NoDomain, ScatterStatus::TooManyTiles, ScatterStatus::OutOfMemory })
+    for (const ScatterStatus status :
+         { ScatterStatus::Ok, ScatterStatus::EmptyPattern, ScatterStatus::InvalidSettings, ScatterStatus::NoDomain,
+           ScatterStatus::TooManyTiles, ScatterStatus::OutOfMemory })
         CHECK(std::string(osc::statusMessage(status)).size() > 1);
 }
 
@@ -118,13 +119,13 @@ TEST_CASE("scatter: on flat ground, the density asked for")
                 REQUIRE(p.y < 100.0f);
                 REQUIRE(p.z == 0.0f);
                 REQUIRE(inst.rank < share);
-                REQUIRE(inst.rank > lastRank);   // each block is in rank order
+                REQUIRE(inst.rank > lastRank); // each block is in rank order
                 lastRank = inst.rank;
                 REQUIRE(inst.model == 0);
                 ids.insert(inst.id);
             }
         }
-        CHECK(ids.size() == r.count());   // every id is different
+        CHECK(ids.size() == r.count()); // every id is different
     }
 }
 
@@ -212,7 +213,7 @@ TEST_CASE("scatter: another seed is another scatter")
     const osc::ScatterResult b = osc::scatterPlanar(pattern, s);
     CHECK(osc::hashInstances(a) != osc::hashInstances(b));
     CHECK(static_cast<double>(b.count()) == doctest::Approx(static_cast<double>(a.count())).epsilon(0.01));
-    CHECK(helpers::survivors(a, b).kept == 0);   // not one id in common
+    CHECK(helpers::survivors(a, b).kept == 0); // not one id in common
 
     // And another pattern, another set of ids too.
     const osc::Pattern other = osc::makeProgressiveBlueNoise(4096, 8);
@@ -230,7 +231,7 @@ TEST_CASE("scatter: an empty surface gives nothing, and that is not an error")
     CHECK(r.status == ScatterStatus::Ok);
     CHECK(r.count() == 0);
 
-    s.domain = osc::Rect{};   // not even a rectangle: still just nothing
+    s.domain = osc::Rect{}; // not even a rectangle: still just nothing
     r = osc::scatterPlanar(pattern, s);
     CHECK(r.status == ScatterStatus::Ok);
     CHECK(r.count() == 0);
@@ -244,7 +245,7 @@ TEST_CASE("scatter: instances land on the surface")
     osc::ScatterSettings s;
     s.tileSize = 20.0f;
     s.density = 1.0f;
-    s.surface = &surface;   // no domain: the extent of the surface
+    s.surface = &surface; // no domain: the extent of the surface
 
     const osc::ScatterResult r = osc::scatterPlanar(pattern, s);
     REQUIRE(r.status == ScatterStatus::Ok);
@@ -253,7 +254,7 @@ TEST_CASE("scatter: instances land on the surface")
     {
         const osc::Vec3 p = inst.transform.t;
         REQUIRE(p.z == doctest::Approx(5.0f + 0.1f * p.x - 0.2f * p.y).epsilon(1e-5));
-        REQUIRE(inst.transform.z.z == 1.0f);   // upright: alignToNormal is 0
+        REQUIRE(inst.transform.z.z == 1.0f); // upright: alignToNormal is 0
     }
 
     // A domain larger than the surface is cut down to it; one that misses it gives nothing.
@@ -335,8 +336,8 @@ TEST_CASE("scatter: slope limit")
         CHECK(osc::scatterPlanar(pattern, s).count() == everything);
         s.slopeMaxDegrees = 45.5f;
         CHECK(osc::scatterPlanar(pattern, s).count() == everything);
-        s.slopeMinDegrees = kNaN;   // read as "from 0"
-        s.slopeMaxDegrees = kNaN;   // read as "to 180"
+        s.slopeMinDegrees = kNaN; // read as "from 0"
+        s.slopeMaxDegrees = kNaN; // read as "to 180"
         CHECK(osc::scatterPlanar(pattern, s).count() == everything);
     }
     SUBCASE("a range nothing fits in")
@@ -346,7 +347,7 @@ TEST_CASE("scatter: slope limit")
         s.slopeMaxDegrees = 80.0f;
         CHECK(osc::scatterPlanar(pattern, s).count() == 0);
         s.slopeMinDegrees = 30.0f;
-        s.slopeMaxDegrees = 10.0f;   // upside down
+        s.slopeMaxDegrees = 10.0f; // upside down
         CHECK(osc::scatterPlanar(pattern, s).count() == 0);
     }
     SUBCASE("measured from another vertical")
@@ -354,7 +355,7 @@ TEST_CASE("scatter: slope limit")
         // With "up" leaning 45 degrees towards +X... the slope faces away from it: it is the ramp's
         // normal (-1, 0, 1) that is 90 degrees from (1, 0, 1), and the flat half that is 45.
         s.limitSlope = true;
-        s.up = { 5.0f, 0.0f, 5.0f };   // any length
+        s.up = { 5.0f, 0.0f, 5.0f }; // any length
         s.slopeMinDegrees = 80.0f;
         s.slopeMaxDegrees = 100.0f;
         const osc::ScatterResult r = osc::scatterPlanar(pattern, s);
@@ -466,7 +467,7 @@ TEST_CASE("scatter: density map over a rectangle of the plane")
     r = osc::scatterPlanar(pattern, s);
     CHECK(r.status == ScatterStatus::Ok);
     for (const osc::Instance& inst : flatten(r))
-        REQUIRE(inst.transform.t.x < 75.0f);   // from the middle of the second pixel on, the blend is NaN
+        REQUIRE(inst.transform.t.x < 75.0f); // from the middle of the second pixel on, the blend is NaN
     CHECK(r.count() > everything / 5);
 }
 
@@ -547,7 +548,8 @@ TEST_CASE("scatter: areas")
 
     SUBCASE("an include area")
     {
-        const osc::AreaSet areas({ helpers::area(osc::AreaMode::Include, { helpers::rectangle(20.0f, 30.0f, 70.0f, 60.0f) }) });
+        const osc::AreaSet areas(
+            { helpers::area(osc::AreaMode::Include, { helpers::rectangle(20.0f, 30.0f, 70.0f, 60.0f) }) });
         s.areas = &areas;
         const osc::ScatterResult r = osc::scatterPlanar(pattern, s);
         CHECK(static_cast<double>(r.count()) == doctest::Approx(everything * 0.15).epsilon(0.03));
@@ -567,7 +569,8 @@ TEST_CASE("scatter: areas")
     }
     SUBCASE("an exclude area")
     {
-        const osc::AreaSet areas({ helpers::area(osc::AreaMode::Exclude, { helpers::rectangle(20.0f, 30.0f, 70.0f, 60.0f) }) });
+        const osc::AreaSet areas(
+            { helpers::area(osc::AreaMode::Exclude, { helpers::rectangle(20.0f, 30.0f, 70.0f, 60.0f) }) });
         s.areas = &areas;
         const osc::ScatterResult r = osc::scatterPlanar(pattern, s);
         CHECK(r.stats.rejectedByAreas > 0);
@@ -586,10 +589,10 @@ TEST_CASE("scatter: areas")
     SUBCASE("a falloff thins the instances gradually")
     {
         // Full density up to x = 40, none from x = 80 on.
-        const osc::AreaSet areas({ helpers::area(osc::AreaMode::Include, { helpers::rectangle(-10.0f, -10.0f, 40.0f, 110.0f) },
-                                                 0.0f, 40.0f) });
+        const osc::AreaSet areas({ helpers::area(osc::AreaMode::Include,
+                                                 { helpers::rectangle(-10.0f, -10.0f, 40.0f, 110.0f) }, 0.0f, 40.0f) });
         s.areas = &areas;
-        double bands[5] = {};   // of 20 units
+        double bands[5] = {}; // of 20 units
         for (const osc::Instance& inst : flatten(osc::scatterPlanar(pattern, s)))
             bands[std::min(4, static_cast<int>(inst.transform.t.x / 20.0f))] += 1.0;
         const double full = everything * 0.2;
@@ -634,7 +637,7 @@ TEST_CASE("scatter: models by probability")
         }
         for (double& c : counts)
             c /= all.empty() ? 1.0 : static_cast<double>(all.size());
-        CHECK(all.size() == everything);   // the models never change how many instances there are
+        CHECK(all.size() == everything); // the models never change how many instances there are
         return counts;
     };
 
@@ -663,7 +666,8 @@ TEST_CASE("scatter: models by probability")
     s.modelWeights = { 1.0f, 1.0f };
     int cells[2][25] = {};
     for (const osc::Instance& inst : flatten(osc::scatterPlanar(pattern, s)))
-        ++cells[inst.model][static_cast<int>(inst.transform.t.y / 20.0f) * 5 + static_cast<int>(inst.transform.t.x / 20.0f)];
+        ++cells[inst.model]
+               [static_cast<int>(inst.transform.t.y / 20.0f) * 5 + static_cast<int>(inst.transform.t.x / 20.0f)];
     for (const auto& model : cells)
         for (const int count : model)
             CHECK(count > 2048 * 0.9);
@@ -724,7 +728,7 @@ TEST_CASE("scatter: rotation ranges")
         for (const osc::Instance& inst : flatten(osc::scatterPlanar(pattern, s)))
         {
             REQUIRE(inst.transform.x.x == 0.0f);
-            REQUIRE(inst.transform.x.y == 1.0f);    // X now points along +Y
+            REQUIRE(inst.transform.x.y == 1.0f); // X now points along +Y
             REQUIRE(inst.transform.y.x == -1.0f);
             REQUIRE(inst.transform.y.y == 0.0f);
         }
@@ -791,7 +795,7 @@ TEST_CASE("scatter: scale ranges")
     SUBCASE("uniform: one factor for the three axes, from the first range")
     {
         s.transform.scale[0] = { 0.5f, 2.0f };
-        s.transform.scale[1] = { 100.0f, 200.0f };   // not used
+        s.transform.scale[1] = { 100.0f, 200.0f }; // not used
         float low = 1e9f, high = 0.0f;
         double sum = 0.0;
         const std::vector<osc::Instance> all = flatten(osc::scatterPlanar(pattern, s));
@@ -809,7 +813,7 @@ TEST_CASE("scatter: scale ranges")
         CHECK(low < 0.51f);
         CHECK(high <= 2.0001f);
         CHECK(high > 1.99f);
-        CHECK(sum / static_cast<double>(all.size()) == doctest::Approx(1.25).epsilon(0.02));   // evenly spread
+        CHECK(sum / static_cast<double>(all.size()) == doctest::Approx(1.25).epsilon(0.02)); // evenly spread
     }
     SUBCASE("per axis: each its own range, independent of the others")
     {
@@ -878,7 +882,7 @@ TEST_CASE("scatter: alignment to the surface normal")
             REQUIRE(inst.transform.z.x == doctest::Approx(-0.3826834f));
             checkNoShear(inst.transform);
         }
-        s.transform.alignToNormal = 55.0f;   // clamped to 1
+        s.transform.alignToNormal = 55.0f; // clamped to 1
         for (const osc::Instance& inst : flatten(osc::scatterPlanar(pattern, s)))
             REQUIRE(inst.transform.z.z == doctest::Approx(h));
     }
@@ -911,10 +915,10 @@ TEST_CASE("scatter: alignment to the surface normal")
             REQUIRE(inst.transform.z.z == -1.0f);
             checkNoShear(inst.transform);
         }
-        for (const osc::Vec3 nonsense : { osc::Vec3{ 0.0f, 0.0f, 0.0f }, osc::Vec3{ kNaN, 0.0f, 1.0f },
-                                          osc::Vec3{ kInf, 0.0f, 0.0f } })
+        for (const osc::Vec3 nonsense :
+             { osc::Vec3{ 0.0f, 0.0f, 0.0f }, osc::Vec3{ kNaN, 0.0f, 1.0f }, osc::Vec3{ kInf, 0.0f, 0.0f } })
         {
-            s.up = nonsense;   // read as (0, 0, 1)
+            s.up = nonsense; // read as (0, 0, 1)
             for (const osc::Instance& inst : flatten(osc::scatterPlanar(pattern, s)))
                 REQUIRE(inst.transform.z.z == 1.0f);
         }
@@ -965,7 +969,8 @@ TEST_CASE("scatter: translation ranges")
     }
     SUBCASE("sideways, and the filters still see where the instance was born")
     {
-        const osc::AreaSet areas({ helpers::area(osc::AreaMode::Include, { helpers::rectangle(10.0f, 10.0f, 50.0f, 50.0f) }) });
+        const osc::AreaSet areas(
+            { helpers::area(osc::AreaMode::Include, { helpers::rectangle(10.0f, 10.0f, 50.0f, 50.0f) }) });
         s.areas = &areas;
         const std::size_t before = osc::scatterPlanar(pattern, s).count();
         s.transform.translation[0] = { 100.0f, 100.0f };
@@ -979,7 +984,7 @@ TEST_CASE("scatter: translation ranges")
 TEST_CASE("scatter: the instance limit")
 {
     const osc::Pattern& pattern = testPattern();
-    osc::ScatterSettings s = flatSettings(pattern, 100.0f, 1.0f);   // 102 400 instances
+    osc::ScatterSettings s = flatSettings(pattern, 100.0f, 1.0f); // 102 400 instances
     const osc::ScatterResult all = osc::scatterPlanar(pattern, s);
     REQUIRE(all.count() > 100000);
 
@@ -996,7 +1001,7 @@ TEST_CASE("scatter: the instance limit")
         const osc::ScatterResult r = osc::scatterPlanar(pattern, s);
         CHECK(r.stats.limited);
         CHECK(r.count() <= 20000);
-        CHECK(r.count() > 19900);   // as close as whole pattern points allow: 25 instances apart
+        CHECK(r.count() > 19900); // as close as whole pattern points allow: 25 instances apart
         CHECK(r.stats.patternShare == doctest::Approx(20000.0 / 102400.0).epsilon(0.01));
 
         const helpers::Survivors kept = helpers::survivors(r, all);
@@ -1025,7 +1030,8 @@ TEST_CASE("scatter: the instance limit")
     SUBCASE("the limit counts what the filters leave, not what the domain could hold")
     {
         // An include area a tenth of the domain: about 10 240 instances, under a limit of 15 000.
-        const osc::AreaSet areas({ helpers::area(osc::AreaMode::Include, { helpers::rectangle(0.0f, 0.0f, 100.0f, 10.0f) }) });
+        const osc::AreaSet areas(
+            { helpers::area(osc::AreaMode::Include, { helpers::rectangle(0.0f, 0.0f, 100.0f, 10.0f) }) });
         s.areas = &areas;
         const std::size_t unlimited = osc::scatterPlanar(pattern, s).count();
         s.maxInstances = 15000;
@@ -1040,13 +1046,14 @@ TEST_CASE("scatter: the instance limit")
     }
     SUBCASE("a limit below one instance per pattern point leaves nothing, the same for any thread count")
     {
-        s.maxInstances = 10;   // each pattern point gives 25 instances here
+        s.maxInstances = 10; // each pattern point gives 25 instances here
         const osc::ScatterResult r = osc::scatterPlanar(pattern, s);
         CHECK(r.status == ScatterStatus::Ok);
         CHECK(r.stats.limited);
         CHECK(r.count() == 0);
         s.maxInstances = 20000;
-        CHECK(osc::hashInstances(osc::scatterPlanar(pattern, s, 1)) == osc::hashInstances(osc::scatterPlanar(pattern, s, 7)));
+        CHECK(osc::hashInstances(osc::scatterPlanar(pattern, s, 1)) ==
+              osc::hashInstances(osc::scatterPlanar(pattern, s, 7)));
     }
 }
 
@@ -1104,7 +1111,8 @@ TEST_CASE("scatter: nonsense in the settings never breaks it")
         osc::Image image;
         image.width = static_cast<int>(next() % 6);
         image.height = static_cast<int>(next() % 6);
-        image.pixels.resize(static_cast<std::size_t>(image.width) * static_cast<std::size_t>(image.height) + (next() % 5 == 0 ? 1 : 0));
+        image.pixels.resize(static_cast<std::size_t>(image.width) * static_cast<std::size_t>(image.height) +
+                            (next() % 5 == 0 ? 1 : 0));
         for (float& p : image.pixels)
             p = number();
 
@@ -1140,9 +1148,11 @@ TEST_CASE("scatter: nonsense in the settings never breaks it")
         {
             // Finite ranges here (bounded so the products stay finite): what is being tested is that
             // nonsense anywhere else never turns into nonsense in an instance.
-            s.transform.rotationDegrees[axis] = { osc::unitFloat(next()) * 720.0f - 360.0f, osc::unitFloat(next()) * 720.0f - 360.0f };
+            s.transform.rotationDegrees[axis] = { osc::unitFloat(next()) * 720.0f - 360.0f,
+                                                  osc::unitFloat(next()) * 720.0f - 360.0f };
             s.transform.scale[axis] = { osc::unitFloat(next()) * 3.0f, osc::unitFloat(next()) * 3.0f };
-            s.transform.translation[axis] = { osc::unitFloat(next()) * 10.0f - 5.0f, osc::unitFloat(next()) * 10.0f - 5.0f };
+            s.transform.translation[axis] = { osc::unitFloat(next()) * 10.0f - 5.0f,
+                                              osc::unitFloat(next()) * 10.0f - 5.0f };
         }
         // Keep the work bounded: a huge domain with a tiny tile is a legitimate TooManyTiles or a
         // legitimate million instances, and neither is what this test is about.
@@ -1173,5 +1183,5 @@ TEST_CASE("scatter: nonsense in the settings never breaks it")
                 REQUIRE(inst.model < std::max<std::size_t>(1, s.modelWeights.size()));
             }
     }
-    CHECK(withInstances > 20);   // and it was not all rejected up front
+    CHECK(withInstances > 20); // and it was not all rejected up front
 }

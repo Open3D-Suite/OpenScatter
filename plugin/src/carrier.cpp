@@ -69,7 +69,8 @@ void refreshRendererName()
             name = className.data() ? className.data() : L"";
         }
     }
-    std::transform(name.begin(), name.end(), name.begin(), [](wchar_t c) { return static_cast<wchar_t>(std::towlower(c)); });
+    std::transform(name.begin(), name.end(), name.begin(),
+                   [](wchar_t c) { return static_cast<wchar_t>(std::towlower(c)); });
     std::lock_guard<std::mutex> lock(g_rendererMutex);
     g_rendererName = name;
     g_rendererKnown = true;
@@ -121,15 +122,18 @@ MSTR handleText(INode* node)
 // What the scene holds of one carrier: the nodes that carry its tag.
 struct CarrierNodes
 {
-    INode* source = nullptr;                // the PF Source the tag names (its handle is the tag)
-    INode* op = nullptr;                    // our operator
-    OpenScatterObject* scatter = nullptr;   // what the operator carries; null when that object is gone
+    INode* source = nullptr;              // the PF Source the tag names (its handle is the tag)
+    INode* op = nullptr;                  // our operator
+    OpenScatterObject* scatter = nullptr; // what the operator carries; null when that object is gone
     int nodes = 0;
 
     // Usable as it is: the source, an operator that still has its scatter object, and the event and
     // the Render operator next to them. Anything less - the user deleted a part of it, or its
     // scatter - is a leftover: it emits nothing, a new carrier replaces it and a sync removes it.
-    bool whole() const { return nodes >= 4 && source && op && scatter; }
+    bool whole() const
+    {
+        return nodes >= 4 && source && op && scatter;
+    }
 };
 
 std::map<std::wstring, CarrierNodes> findCarriers(const std::vector<INode*>& nodes)
@@ -157,44 +161,43 @@ std::map<std::wstring, CarrierNodes> findCarriers(const std::vector<INode*>& nod
 bool createCarrier(INode* scatterNode)
 {
     MSTR script;
-    script.printf(
-        _T("(\n")
-        _T("	local sc = maxOps.getNodeByHandle %u\n")
-        _T("	if sc != undefined do with undo off\n")
-        _T("	(\n")
-        _T("		local pf = PF_Source name:(\"OpenScatter carrier - \" + sc.name)\n")
-        _T("		pf.Enable_Particles = true\n")
-        _T("		pf.Quantity_Viewport = 0.0\n")
-        _T("		pf.Quantity_Render = 100.0\n")
-        _T("		pf.Particle_Amount_Limit = 10000000\n")
-        _T("		pf.Show_Logo = false\n")
-        _T("		pf.Show_Emitter = false\n")
-        _T("		pf.Integration_for_Render = 0\n")
-        _T("		particleFlow.BeginEdit()\n")
-        _T("		local op = OpenScatterOperator name:(\"OpenScatter instances - \" + sc.name)\n")
-        _T("		local rn = RenderParticles name:(\"OpenScatter render - \" + sc.name)\n")
-        _T("		local ev = Event name:(\"OpenScatter event - \" + sc.name)\n")
-        _T("		particleFlow.EndEdit()\n")
-        _T("		ev.AppendAction op\n")
-        _T("		pf.AppendAction rn\n")
-        _T("		pf.AppendInitialActionList ev\n")
-        _T("		op.scatter = sc\n")
-        _T("		local id = pf.inode.handle as string\n")
-        _T("		for n in #(pf, op, rn, ev) do setUserProp n \"%s\" id\n")
-        _T("		sc.layer.addNode pf\n")
-        _T("		pf.renderable = true\n")
-        _T("		pf.isFrozen = true\n")
-        _T("		pf.showFrozenInGray = false\n")
-        _T("	)\n")
-        _T("	OK\n")
-        _T(")\n"),
-        static_cast<unsigned>(scatterNode->GetHandle()), kCarrierProperty);
+    script.printf(_T("(\n")
+                  _T("	local sc = maxOps.getNodeByHandle %u\n")
+                  _T("	if sc != undefined do with undo off\n")
+                  _T("	(\n")
+                  _T("		local pf = PF_Source name:(\"OpenScatter carrier - \" + sc.name)\n")
+                  _T("		pf.Enable_Particles = true\n")
+                  _T("		pf.Quantity_Viewport = 0.0\n")
+                  _T("		pf.Quantity_Render = 100.0\n")
+                  _T("		pf.Particle_Amount_Limit = 10000000\n")
+                  _T("		pf.Show_Logo = false\n")
+                  _T("		pf.Show_Emitter = false\n")
+                  _T("		pf.Integration_for_Render = 0\n")
+                  _T("		particleFlow.BeginEdit()\n")
+                  _T("		local op = OpenScatterOperator name:(\"OpenScatter instances - \" + sc.name)\n")
+                  _T("		local rn = RenderParticles name:(\"OpenScatter render - \" + sc.name)\n")
+                  _T("		local ev = Event name:(\"OpenScatter event - \" + sc.name)\n")
+                  _T("		particleFlow.EndEdit()\n")
+                  _T("		ev.AppendAction op\n")
+                  _T("		pf.AppendAction rn\n")
+                  _T("		pf.AppendInitialActionList ev\n")
+                  _T("		op.scatter = sc\n")
+                  _T("		local id = pf.inode.handle as string\n")
+                  _T("		for n in #(pf, op, rn, ev) do setUserProp n \"%s\" id\n")
+                  _T("		sc.layer.addNode pf\n")
+                  _T("		pf.renderable = true\n")
+                  _T("		pf.isFrozen = true\n")
+                  _T("		pf.showFrozenInGray = false\n")
+                  _T("	)\n")
+                  _T("	OK\n")
+                  _T(")\n"),
+                  static_cast<unsigned>(scatterNode->GetHandle()), kCarrierProperty);
     return ExecuteMAXScriptScript(script.data(), MAXScript::ScriptSource::NonEmbedded, TRUE) != FALSE;
 }
 
 class SyncTask : public MainThreadTask
 {
-public:
+  public:
     void Execute() override
     {
         g_syncPending = false;
@@ -240,8 +243,13 @@ void onNotify(void*, NotifyInfo* info)
     }
 }
 
-const int kNotifications[] = { NOTIFY_SYSTEM_SHUTDOWN,  NOTIFY_POST_RENDERER_CHANGE, NOTIFY_PRE_RENDER,     NOTIFY_FILE_POST_OPEN,
-                               NOTIFY_FILE_POST_MERGE_PROCESS_FINALIZED,  NOTIFY_SYSTEM_POST_RESET,    NOTIFY_SYSTEM_POST_NEW };
+const int kNotifications[] = { NOTIFY_SYSTEM_SHUTDOWN,
+                               NOTIFY_POST_RENDERER_CHANGE,
+                               NOTIFY_PRE_RENDER,
+                               NOTIFY_FILE_POST_OPEN,
+                               NOTIFY_FILE_POST_MERGE_PROCESS_FINALIZED,
+                               NOTIFY_SYSTEM_POST_RESET,
+                               NOTIFY_SYSTEM_POST_NEW };
 
 } // namespace
 
@@ -332,7 +340,7 @@ bool OpenScatterObject::syncCombinedMaterial()
         INode* node = pblock->GetINode(p_models, t, i);
         Mtl* mtl = node ? node->GetMtl() : nullptr;
         if (mtl == current)
-            mtl = nullptr;   // a model wearing the combined material itself would be a loop
+            mtl = nullptr; // a model wearing the combined material itself would be a loop
         const int n = materialSlotsOf(mtl);
         if (mtl && mtl->IsMultiMtl())
         {
@@ -349,7 +357,8 @@ bool OpenScatterObject::syncCombinedMaterial()
 
     bool changed = false;
     HoldSuspend noUndo;
-    MultiMtl* multi = (current && current->ClassID() == Class_ID(MULTI_CLASS_ID, 0)) ? static_cast<MultiMtl*>(current) : nullptr;
+    MultiMtl* multi =
+        (current && current->ClassID() == Class_ID(MULTI_CLASS_ID, 0)) ? static_cast<MultiMtl*>(current) : nullptr;
     if (!multi)
     {
         multi = NewDefaultMultiMtl();
@@ -422,7 +431,8 @@ void syncCarriers(bool allowDelete)
                 // The event takes its material from the operator: tell it to ask again.
                 for (INode* op : operators)
                     if (scatterOfOperator(op->GetObjectRef()) == scatter)
-                        op->GetObjectRef()->NotifyDependents(FOREVER, PART_MTL, kPFMSG_UpdateMaterial, NOTIFY_ALL, TRUE);
+                        op->GetObjectRef()->NotifyDependents(FOREVER, PART_MTL, kPFMSG_UpdateMaterial, NOTIFY_ALL,
+                                                             TRUE);
             }
         }
     }

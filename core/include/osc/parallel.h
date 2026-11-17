@@ -19,13 +19,15 @@
 namespace osc
 {
 
-inline unsigned hardwareThreads() { return std::max(1u, std::thread::hardware_concurrency()); }
+inline unsigned hardwareThreads()
+{
+    return std::max(1u, std::thread::hardware_concurrency());
+}
 
 // Calls fn(index, worker) once for every index in [0, count), on up to "threads" threads, the calling
 // one included. "worker" is below "threads" and identifies the thread making the call. If a call throws,
 // the remaining work is abandoned and the first exception is thrown again here.
-template <class Fn>
-void parallelFor(std::size_t count, unsigned threads, Fn&& fn)
+template <class Fn> void parallelFor(std::size_t count, unsigned threads, Fn&& fn)
 {
     if (count == 0)
         return;

@@ -45,7 +45,7 @@ constexpr std::size_t kSoftwareMaxInstances = 20000;
 constexpr std::size_t kSoftwareMaxTriangles = 250000;
 
 std::mutex g_driverMutex;
-int g_driverApi = 0;   // 0 = not known yet
+int g_driverApi = 0; // 0 = not known yet
 
 // Which display driver this 3ds Max draws its viewports with, as the number its NitrousGraphicsManager
 // interface gives: 3 = Direct3D 11 on a graphics card, 4 = Nitrous Software (Direct3D WARP, on the CPU);
@@ -64,7 +64,8 @@ int displayDriverApi()
     if (!ip || !ip->GetActiveViewExp().IsAlive())
         return 0;
     FPValue result;
-    if (ExecuteMAXScriptScript(_T("try (NitrousGraphicsManager.API()) catch (0)"), MAXScript::ScriptSource::NonEmbedded, TRUE, &result) &&
+    if (ExecuteMAXScriptScript(_T("try (NitrousGraphicsManager.API()) catch (0)"), MAXScript::ScriptSource::NonEmbedded,
+                               TRUE, &result) &&
         static_cast<int>(result.type) == static_cast<int>(TYPE_INT) && result.i > 0)
         g_driverApi = result.i;
     return g_driverApi;
@@ -93,7 +94,8 @@ bool initBuffer(VertexBufferHandle& buffer, std::vector<Point3>& data)
                              BufferPoolTypeHardwareBuffer, VertexFieldFloat3);
 }
 
-const int kBoxQuads[6][4] = { { 0, 3, 2, 1 }, { 4, 5, 6, 7 }, { 0, 1, 5, 4 }, { 1, 2, 6, 5 }, { 2, 3, 7, 6 }, { 3, 0, 4, 7 } };
+const int kBoxQuads[6][4] = { { 0, 3, 2, 1 }, { 4, 5, 6, 7 }, { 0, 1, 5, 4 },
+                              { 1, 2, 6, 5 }, { 2, 3, 7, 6 }, { 3, 0, 4, 7 } };
 const int kBoxEdges[12][2] = { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 }, { 4, 5 }, { 5, 6 },
                                { 6, 7 }, { 7, 4 }, { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 } };
 
@@ -101,8 +103,14 @@ void boxCorners(const Box3& box, Point3 c[8])
 {
     const Point3 lo = box.Min();
     const Point3 hi = box.Max();
-    c[0] = Point3(lo.x, lo.y, lo.z); c[1] = Point3(hi.x, lo.y, lo.z); c[2] = Point3(hi.x, hi.y, lo.z); c[3] = Point3(lo.x, hi.y, lo.z);
-    c[4] = Point3(lo.x, lo.y, hi.z); c[5] = Point3(hi.x, lo.y, hi.z); c[6] = Point3(hi.x, hi.y, hi.z); c[7] = Point3(lo.x, hi.y, hi.z);
+    c[0] = Point3(lo.x, lo.y, lo.z);
+    c[1] = Point3(hi.x, lo.y, lo.z);
+    c[2] = Point3(hi.x, hi.y, lo.z);
+    c[3] = Point3(lo.x, hi.y, lo.z);
+    c[4] = Point3(lo.x, lo.y, hi.z);
+    c[5] = Point3(hi.x, lo.y, hi.z);
+    c[6] = Point3(hi.x, hi.y, hi.z);
+    c[7] = Point3(lo.x, hi.y, hi.z);
 }
 
 // Triangles of the model (or of its box), three positions each.
@@ -115,8 +123,12 @@ void shadedPositions(const ModelData& model, bool asBox, std::vector<Point3>& po
         boxCorners(model.bounds, c);
         for (const auto& q : kBoxQuads)
         {
-            positions.push_back(c[q[0]]); positions.push_back(c[q[1]]); positions.push_back(c[q[2]]);
-            positions.push_back(c[q[0]]); positions.push_back(c[q[2]]); positions.push_back(c[q[3]]);
+            positions.push_back(c[q[0]]);
+            positions.push_back(c[q[1]]);
+            positions.push_back(c[q[2]]);
+            positions.push_back(c[q[0]]);
+            positions.push_back(c[q[2]]);
+            positions.push_back(c[q[3]]);
         }
         return;
     }
@@ -154,7 +166,8 @@ void wirePositions(const ModelData& model, bool asBox, std::vector<Point3>& posi
             const DWORD a = face.v[k];
             const DWORD b = face.v[(k + 1) % 3];
             if (a > b)
-                continue;   // an edge shared by two faces is drawn once (open edges with a > b are lost: fine for a preview)
+                continue; // an edge shared by two faces is drawn once (open edges with a > b are lost: fine for a
+                          // preview)
             positions.push_back(mesh.verts[a]);
             positions.push_back(mesh.verts[b]);
         }
@@ -172,8 +185,8 @@ void wirePositions(const ModelData& model, bool asBox, std::vector<Point3>& posi
 }
 
 // Builds one instanced geometry. Returns null when the driver refuses (out of GPU memory).
-ViewportInstancing::InstanceDisplayGeometry* buildGeometry(std::vector<Point3>& positions, bool lines, std::vector<Matrix3>& matrices,
-                                                           AColor color)
+ViewportInstancing::InstanceDisplayGeometry* buildGeometry(std::vector<Point3>& positions, bool lines,
+                                                           std::vector<Matrix3>& matrices, AColor color)
 {
     const std::size_t numVerts = positions.size();
     const std::size_t perPrimitive = lines ? 2 : 3;
@@ -215,7 +228,8 @@ ViewportInstancing::InstanceDisplayGeometry* buildGeometry(std::vector<Point3>& 
         std::vector<Point3> tangents(numVerts, Point3(1.0f, 0.0f, 0.0f));
         std::vector<Point3> bitangents(numVerts, Point3(0.0f, 1.0f, 0.0f));
         VertexBufferHandle uvBuffer, tangentBuffer, bitangentBuffer;
-        if (!initBuffer(uvBuffer, uvs) || !initBuffer(tangentBuffer, tangents) || !initBuffer(bitangentBuffer, bitangents))
+        if (!initBuffer(uvBuffer, uvs) || !initBuffer(tangentBuffer, tangents) ||
+            !initBuffer(bitangentBuffer, bitangents))
         {
             geometry->Release();
             return nullptr;
@@ -234,7 +248,7 @@ ViewportInstancing::InstanceDisplayGeometry* buildGeometry(std::vector<Point3>& 
     data.numInstances = matrices.size();
     data.bTransformationsAreInWorldSpace = true;
     data.pMatrices = matrices.data();
-    data.pColors = &color;   // one colour, used for every instance
+    data.pColors = &color; // one colour, used for every instance
     data.numColors = 1;
     if (!geometry->CreateInstanceData(data))
     {
@@ -248,19 +262,23 @@ ViewportInstancing::InstanceDisplayGeometry* buildGeometry(std::vector<Point3>& 
 void drawIcon(GraphicsWindow* gw, float size)
 {
     const float h = 0.5f * size;
-    Point3 square[5] = { Point3(-h, -h, 0.0f), Point3(h, -h, 0.0f), Point3(h, h, 0.0f), Point3(-h, h, 0.0f), Point3(0.0f, 0.0f, 0.0f) };
+    Point3 square[5] = { Point3(-h, -h, 0.0f), Point3(h, -h, 0.0f), Point3(h, h, 0.0f), Point3(-h, h, 0.0f),
+                         Point3(0.0f, 0.0f, 0.0f) };
     gw->polyline(4, square, nullptr, nullptr, TRUE, nullptr);
-    const float spots[5][2] = { { -0.25f, -0.2f }, { 0.22f, -0.28f }, { 0.0f, 0.05f }, { -0.2f, 0.28f }, { 0.27f, 0.22f } };
+    const float spots[5][2] = {
+        { -0.25f, -0.2f }, { 0.22f, -0.28f }, { 0.0f, 0.05f }, { -0.2f, 0.28f }, { 0.27f, 0.22f }
+    };
     for (const auto& s : spots)
     {
-        Point3 blade[3] = { Point3(s[0] * size, s[1] * size, 0.0f), Point3(s[0] * size, s[1] * size, 0.3f * size), Point3(0.0f, 0.0f, 0.0f) };
+        Point3 blade[3] = { Point3(s[0] * size, s[1] * size, 0.0f), Point3(s[0] * size, s[1] * size, 0.3f * size),
+                            Point3(0.0f, 0.0f, 0.0f) };
         gw->polyline(2, blade, nullptr, nullptr, FALSE, nullptr);
     }
 }
 
 class ScatterCreateCallBack : public CreateMouseCallBack
 {
-public:
+  public:
     int proc(ViewExp* vpt, int msg, int point, int, IPoint2 m, Matrix3& mat) override
     {
         if (!vpt || !vpt->IsAlive())
@@ -270,7 +288,7 @@ public:
             if (point == 0)
                 mat.SetTrans(vpt->SnapPoint(m, m, nullptr, SNAP_IN_PLANE));
             if (msg == MOUSE_POINT)
-                return CREATE_STOP;   // one click places the object; everything else is in its parameters
+                return CREATE_STOP; // one click places the object; everything else is in its parameters
         }
         else if (msg == MOUSE_ABORT)
         {
@@ -288,7 +306,8 @@ ViewportBudget viewportBudget(int maxInstancesParam, int maxTrianglesParam)
 {
     ViewportBudget budget;
     const int api = displayDriverApi();
-    budget.driver = api == kDriverSoftware ? L"software" : (api == 3 ? L"Direct3D 11" : (api > 0 ? L"hardware" : L"unknown"));
+    budget.driver =
+        api == kDriverSoftware ? L"software" : (api == 3 ? L"Direct3D 11" : (api > 0 ? L"hardware" : L"unknown"));
     // An unknown driver gets the small budget: too few boxes is a nuisance, a frozen viewport is worse.
     budget.software = api == kDriverSoftware || api <= 0;
     budget.maxInstances = budget.software ? kSoftwareMaxInstances : kGpuMaxInstances;
@@ -302,11 +321,17 @@ ViewportBudget viewportBudget(int maxInstancesParam, int maxTrianglesParam)
 
 class ViewportDisplay
 {
-public:
-    explicit ViewportDisplay(OpenScatterObject* owner) : m_owner(owner) {}
-    ~ViewportDisplay() { release(); }
+  public:
+    explicit ViewportDisplay(OpenScatterObject* owner) : m_owner(owner)
+    {
+    }
+    ~ViewportDisplay()
+    {
+        release();
+    }
 
-    bool updateItems(const UpdateDisplayContext& context, UpdateNodeContext& nodeContext, IRenderItemContainer& container)
+    bool updateItems(const UpdateDisplayContext& context, UpdateNodeContext& nodeContext,
+                     IRenderItemContainer& container)
     {
         IParamBlock2* params = m_owner->params();
         if (!params)
@@ -326,7 +351,8 @@ public:
         m_owner->update(t);
         std::lock_guard<std::recursive_mutex> lock(m_owner->mutex());
         const InstanceBuffer& buffer = m_owner->buffer();
-        const ViewportBudget budget = viewportBudget(params->GetInt(p_viewportMaxInstances, t), params->GetInt(p_viewportMaxTriangles, t));
+        const ViewportBudget budget =
+            viewportBudget(params->GetInt(p_viewportMaxInstances, t), params->GetInt(p_viewportMaxTriangles, t));
         if (!m_built || m_version != buffer.version || m_mode != mode || m_maxInstances != budget.maxInstances ||
             m_maxTriangles != budget.maxTriangles)
         {
@@ -351,17 +377,18 @@ public:
     {
         const ViewportBudget budget = viewportBudget(0, 0);
         MSTR text;
-        text.printf(_T("driver=%s software=%d budgetInstances=%llu budgetTriangles=%llu drawn=%s instances=%llu of %llu ")
-                    _T("triangles=%llu buildSeconds=%.4f refused=%d"),
-                    budget.driver.c_str(), budget.software ? 1 : 0, static_cast<unsigned long long>(m_maxInstances),
-                    static_cast<unsigned long long>(m_maxTriangles),
-                    m_drawnMode == kViewMeshes ? _T("meshes") : (m_drawnMode == kViewBoxes ? _T("boxes") : _T("none")),
-                    static_cast<unsigned long long>(m_drawnInstances), static_cast<unsigned long long>(m_totalInstances),
-                    static_cast<unsigned long long>(m_drawnTriangles), m_buildSeconds, m_refused ? 1 : 0);
+        text.printf(
+            _T("driver=%s software=%d budgetInstances=%llu budgetTriangles=%llu drawn=%s instances=%llu of %llu ")
+            _T("triangles=%llu buildSeconds=%.4f refused=%d"),
+            budget.driver.c_str(), budget.software ? 1 : 0, static_cast<unsigned long long>(m_maxInstances),
+            static_cast<unsigned long long>(m_maxTriangles),
+            m_drawnMode == kViewMeshes ? _T("meshes") : (m_drawnMode == kViewBoxes ? _T("boxes") : _T("none")),
+            static_cast<unsigned long long>(m_drawnInstances), static_cast<unsigned long long>(m_totalInstances),
+            static_cast<unsigned long long>(m_drawnTriangles), m_buildSeconds, m_refused ? 1 : 0);
         return text;
     }
 
-private:
+  private:
     struct ModelGeometry
     {
         ViewportInstancing::InstanceDisplayGeometry* shaded = nullptr;

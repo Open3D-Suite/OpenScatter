@@ -40,56 +40,59 @@ void logLine(const char* format, ...);
 // Parameters of the OpenScatter object (ParamBlock2). The ids are stored in scenes: never
 // renumber them, only append.
 // ---------------------------------------------------------------------------------------------
-enum { kScatterParamBlock = 0 };
+enum
+{
+    kScatterParamBlock = 0
+};
 
 enum ScatterParam
 {
-    p_surfaces = 0,          // INode tab: the objects to scatter on
-    p_models,                // INode tab: the objects to scatter
-    p_modelProbabilities,    // float tab, parallel to p_models (a missing entry counts as 1)
-    p_density,               // instances per square metre
-    p_patternSize,           // side of one pattern tile in scene units; 0 = chosen from the density
+    p_surfaces = 0,       // INode tab: the objects to scatter on
+    p_models,             // INode tab: the objects to scatter
+    p_modelProbabilities, // float tab, parallel to p_models (a missing entry counts as 1)
+    p_density,            // instances per square metre
+    p_patternSize,        // side of one pattern tile in scene units; 0 = chosen from the density
     p_seed,
-    p_maxInstances,          // never more instances than this (0 = no limit)
-    p_alignToNormal,         // 0 = upright, 1 = along the surface normal
-    p_rotationMin,           // degrees about the instance's own X, Y and Z
+    p_maxInstances,  // never more instances than this (0 = no limit)
+    p_alignToNormal, // 0 = upright, 1 = along the surface normal
+    p_rotationMin,   // degrees about the instance's own X, Y and Z
     p_rotationMax,
-    p_scaleMin,              // factor along the instance's own X, Y and Z
+    p_scaleMin, // factor along the instance's own X, Y and Z
     p_scaleMax,
-    p_uniformScale,          // one factor for the three axes, from the X range
+    p_uniformScale, // one factor for the three axes, from the X range
     p_limitSlope,
-    p_slopeMin,              // degrees between the surface normal and the world Z
+    p_slopeMin, // degrees between the surface normal and the world Z
     p_slopeMax,
     p_limitAltitude,
-    p_altitudeMin,           // world Z, scene units
+    p_altitudeMin, // world Z, scene units
     p_altitudeMax,
-    p_renderRoute,           // RenderRoute
-    p_meshMaxFaces,          // cap of the aggregate mesh (0 = no cap)
-    p_viewportMode,          // ViewportMode
-    p_viewportMaxInstances,  // 0 = chosen from the display driver
-    p_viewportMaxTriangles,  // 0 = chosen from the display driver
+    p_renderRoute,          // RenderRoute
+    p_meshMaxFaces,         // cap of the aggregate mesh (0 = no cap)
+    p_viewportMode,         // ViewportMode
+    p_viewportMaxInstances, // 0 = chosen from the display driver
+    p_viewportMaxTriangles, // 0 = chosen from the display driver
     p_iconSize,
-    p_material,              // the Multi/Sub-Object material that gathers the models' materials (kept by the plugin)
-    p_threads,               // 0 = one per hardware thread (the result never depends on it)
-    p_algorithmVersion,      // the distribution algorithm the object was created with
+    p_material,         // the Multi/Sub-Object material that gathers the models' materials (kept by the plugin)
+    p_threads,          // 0 = one per hardware thread (the result never depends on it)
+    p_algorithmVersion, // the distribution algorithm the object was created with
 };
 
 // Which output adapter hands the instances to the renderer. Exactly one is active for a render.
 enum RenderRoute
 {
-    kRouteAuto = 0,          // picked from the current renderer
-    kRouteInstancing,        // MaxSDK::RenderTimeInstancing::RenderTimeInstancingInterface (Arnold, V-Ray)
-    kRouteParticleFlow,      // a Particle Flow source driven by our operator (Corona)
-    kRouteMesh,              // one aggregate mesh from GetRenderMesh (renderers with no instancing route)
-    kRouteNone,              // nothing is rendered
+    kRouteAuto = 0,     // picked from the current renderer
+    kRouteInstancing,   // MaxSDK::RenderTimeInstancing::RenderTimeInstancingInterface (Arnold, V-Ray)
+    kRouteParticleFlow, // a Particle Flow source driven by our operator (Corona)
+    kRouteMesh,         // one aggregate mesh from GetRenderMesh (renderers with no instancing route)
+    kRouteNone,         // nothing is rendered
     kRouteCount
 };
 
 enum ViewportMode
 {
     kViewNone = 0,
-    kViewBoxes,              // the bounding box of each model
-    kViewMeshes,             // the models themselves while they fit the budget, boxes otherwise
+    kViewBoxes,  // the bounding box of each model
+    kViewMeshes, // the models themselves while they fit the budget, boxes otherwise
     kViewModeCount
 };
 
@@ -101,39 +104,45 @@ enum ViewportMode
 // already moved by its node's object offset, so an instance transform takes it straight to the world.
 struct ModelData
 {
-    INode* node = nullptr;       // null: the slot is empty and no instance uses it
-    float weight = 0.0f;         // what the engine gets (0 when the slot cannot be used)
-    Mesh mesh;                   // pivot space; face material IDs are slots of the combined material
-    Matrix3 pivotTM;             // the node's object offset: object space -> pivot space
-    Box3 bounds;                 // of the mesh
-    int materialBase = 0;        // first slot of this model in the combined material
-    int materialSlots = 1;       // how many slots it takes
+    INode* node = nullptr; // null: the slot is empty and no instance uses it
+    float weight = 0.0f;   // what the engine gets (0 when the slot cannot be used)
+    Mesh mesh;             // pivot space; face material IDs are slots of the combined material
+    Matrix3 pivotTM;       // the node's object offset: object space -> pivot space
+    Box3 bounds;           // of the mesh
+    int materialBase = 0;  // first slot of this model in the combined material
+    int materialSlots = 1; // how many slots it takes
     Color wireColor = Color(0.6f, 0.6f, 0.6f);
 };
 
 // What changed since an output last looked. Each output keeps the value it built from.
 struct BufferVersion
 {
-    std::uint64_t scatter = 0;   // the instances
-    std::uint64_t models = 0;    // the model meshes
-    bool operator==(const BufferVersion& o) const { return scatter == o.scatter && models == o.models; }
-    bool operator!=(const BufferVersion& o) const { return !(*this == o); }
+    std::uint64_t scatter = 0; // the instances
+    std::uint64_t models = 0;  // the model meshes
+    bool operator==(const BufferVersion& o) const
+    {
+        return scatter == o.scatter && models == o.models;
+    }
+    bool operator!=(const BufferVersion& o) const
+    {
+        return !(*this == o);
+    }
 };
 
 struct InstanceBuffer
 {
     std::vector<ModelData> models;
-    std::vector<osc::Instance> instances;                // world space, in the engine's fixed order
-    std::vector<std::vector<std::uint32_t>> byModel;     // indices into "instances", one list per model
+    std::vector<osc::Instance> instances;            // world space, in the engine's fixed order
+    std::vector<std::vector<std::uint32_t>> byModel; // indices into "instances", one list per model
 
     osc::ScatterStatus status = osc::ScatterStatus::Ok;
     osc::ScatterStats stats;
-    std::uint64_t hash = 0;          // osc::hashInstances of the result
-    float tileSize = 0.0f;           // what the engine was given
-    float engineDensity = 0.0f;      // instances per square scene unit
-    double seconds = 0.0;            // surface extraction + scatter
+    std::uint64_t hash = 0;     // osc::hashInstances of the result
+    float tileSize = 0.0f;      // what the engine was given
+    float engineDensity = 0.0f; // instances per square scene unit
+    double seconds = 0.0;       // surface extraction + scatter
     std::size_t surfaceTriangles = 0;
-    Box3 worldBounds;                // every instance with its model
+    Box3 worldBounds; // every instance with its model
     BufferVersion version;
 };
 
@@ -166,11 +175,11 @@ ClassDesc2* getOpenScatterOperatorDesc();
 // What each renderer-facing adapter handed out for the last render: exactly one of them may have.
 struct RenderReport
 {
-    std::atomic<std::uint64_t> instancingTargets{ 0 };   // instances handed out through the instancing interface
+    std::atomic<std::uint64_t> instancingTargets{ 0 }; // instances handed out through the instancing interface
     // Particles the carrier holds as of its last evaluation. Not reset when a render starts: Particle
     // Flow keeps its particles between renders when nothing changed, and then does not ask again.
     std::atomic<std::uint64_t> particles{ 0 };
-    std::atomic<std::uint64_t> meshInstances{ 0 };       // instances baked into the aggregate mesh
+    std::atomic<std::uint64_t> meshInstances{ 0 }; // instances baked into the aggregate mesh
     std::atomic<std::uint64_t> meshFaces{ 0 };
     // Called when a render starts.
     void reset()
@@ -212,8 +221,8 @@ struct ViewportBudget
 {
     std::size_t maxInstances = 0;
     std::size_t maxTriangles = 0;
-    bool software = false;           // the display driver draws on the CPU
-    std::wstring driver;             // what 3ds Max calls it
+    bool software = false; // the display driver draws on the CPU
+    std::wstring driver;   // what 3ds Max calls it
 };
 
 // The budget the display driver of this 3ds Max can carry, with the object's own limits applied

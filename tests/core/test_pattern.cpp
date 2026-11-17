@@ -76,8 +76,8 @@ TEST_CASE("pattern: stored hashes (the generator must give these on every machin
 TEST_CASE("pattern: every prefix is well spread")
 {
     const osc::Pattern& pattern = helpers::testPattern();
-    for (const std::size_t count : { std::size_t(16), std::size_t(64), std::size_t(256), std::size_t(1024),
-                                     std::size_t(4096) })
+    for (const std::size_t count :
+         { std::size_t(16), std::size_t(64), std::size_t(256), std::size_t(1024), std::size_t(4096) })
     {
         CAPTURE(count);
         CHECK(osc::prefixSpacing(pattern, count) > 0.5f);
@@ -247,5 +247,6 @@ TEST_CASE("pattern: saving refuses what could not be loaded back")
 
     // A folder that does not exist: an error, not an exception.
     const osc::Pattern fine = osc::makeProgressiveBlueNoise(8, 1);
-    CHECK_FALSE(osc::savePattern(fine, std::filesystem::temp_directory_path() / "osc_no_such_folder" / "p.oscp", &error));
+    CHECK_FALSE(
+        osc::savePattern(fine, std::filesystem::temp_directory_path() / "osc_no_such_folder" / "p.oscp", &error));
 }

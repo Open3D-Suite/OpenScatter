@@ -11,18 +11,24 @@
 
 #include "plugin.h"
 
-namespace MaxSDK { namespace RenderTimeInstancing { class RenderTimeInstancingInterface; } }
+namespace MaxSDK
+{
+namespace RenderTimeInstancing
+{
+class RenderTimeInstancingInterface;
+}
+} // namespace MaxSDK
 
 namespace oscmax
 {
 
-class ViewportDisplay;      // viewport.cpp
-class InstancingAdapter;    // render_instancing.cpp
+class ViewportDisplay;   // viewport.cpp
+class InstancingAdapter; // render_instancing.cpp
 
 // The functions the object publishes to MAXScript and Python, next to its parameters.
 class IOpenScatter : public FPMixinInterface
 {
-public:
+  public:
     enum
     {
         kFnUpdate = 0,
@@ -57,20 +63,20 @@ public:
     virtual MSTR fnGetVersion() = 0;
 
     BEGIN_FUNCTION_MAP
-        VFN_0(kFnUpdate, fnUpdate);
-        FN_0(kFnGetInstanceCount, TYPE_INT, fnGetInstanceCount);
-        FN_0(kFnGetInstanceHash, TYPE_TSTR_BV, fnGetInstanceHash);
-        FN_0(kFnGetStatus, TYPE_TSTR_BV, fnGetStatus);
-        FN_0(kFnGetStatistics, TYPE_TSTR_BV, fnGetStatistics);
-        FN_0(kFnGetActiveRoute, TYPE_TSTR_BV, fnGetActiveRoute);
-        FN_0(kFnGetRenderReport, TYPE_TSTR_BV, fnGetRenderReport);
-        FN_0(kFnGetViewportReport, TYPE_TSTR_BV, fnGetViewportReport);
-        FN_0(kFnGetCarrier, TYPE_INODE, fnGetCarrier);
-        VFN_0(kFnSyncCarrier, fnSyncCarrier);
-        FN_1(kFnGetModelInstanceCount, TYPE_INT, fnGetModelInstanceCount, TYPE_INDEX);
-        FN_1(kFnGetInstanceTransform, TYPE_MATRIX3_BV, fnGetInstanceTransform, TYPE_INDEX);
-        FN_1(kFnGetInstanceModel, TYPE_INDEX, fnGetInstanceModel, TYPE_INDEX);
-        FN_0(kFnGetVersion, TYPE_TSTR_BV, fnGetVersion);
+    VFN_0(kFnUpdate, fnUpdate);
+    FN_0(kFnGetInstanceCount, TYPE_INT, fnGetInstanceCount);
+    FN_0(kFnGetInstanceHash, TYPE_TSTR_BV, fnGetInstanceHash);
+    FN_0(kFnGetStatus, TYPE_TSTR_BV, fnGetStatus);
+    FN_0(kFnGetStatistics, TYPE_TSTR_BV, fnGetStatistics);
+    FN_0(kFnGetActiveRoute, TYPE_TSTR_BV, fnGetActiveRoute);
+    FN_0(kFnGetRenderReport, TYPE_TSTR_BV, fnGetRenderReport);
+    FN_0(kFnGetViewportReport, TYPE_TSTR_BV, fnGetViewportReport);
+    FN_0(kFnGetCarrier, TYPE_INODE, fnGetCarrier);
+    VFN_0(kFnSyncCarrier, fnSyncCarrier);
+    FN_1(kFnGetModelInstanceCount, TYPE_INT, fnGetModelInstanceCount, TYPE_INDEX);
+    FN_1(kFnGetInstanceTransform, TYPE_MATRIX3_BV, fnGetInstanceTransform, TYPE_INDEX);
+    FN_1(kFnGetInstanceModel, TYPE_INDEX, fnGetInstanceModel, TYPE_INDEX);
+    FN_0(kFnGetVersion, TYPE_TSTR_BV, fnGetVersion);
     END_FUNCTION_MAP
 
     FPInterfaceDesc* GetDesc() override;
@@ -78,7 +84,7 @@ public:
 
 class OpenScatterObject : public GeomObject, public IOpenScatter
 {
-public:
+  public:
     explicit OpenScatterObject(BOOL loading);
     ~OpenScatterObject() override;
 
@@ -89,13 +95,25 @@ public:
     void update(TimeValue t);
 
     // Readers hold this while they use the buffer.
-    std::recursive_mutex& mutex() { return m_mutex; }
-    const InstanceBuffer& buffer() const { return m_buffer; }
-    Interval validity() const { return m_scatterValid & m_modelsValid; }
+    std::recursive_mutex& mutex()
+    {
+        return m_mutex;
+    }
+    const InstanceBuffer& buffer() const
+    {
+        return m_buffer;
+    }
+    Interval validity() const
+    {
+        return m_scatterValid & m_modelsValid;
+    }
 
     // The one adapter that emits in a render started now.
     RenderRoute activeRoute() const;
-    RenderReport& report() { return m_report; }
+    RenderReport& report()
+    {
+        return m_report;
+    }
 
     // The Multi/Sub-Object material that gathers the models' materials, as the Particle Flow carrier
     // and the aggregate mesh need it. May be null until the first carrier sync.
@@ -103,28 +121,73 @@ public:
     // Rebuilds it from the models' node materials. Main thread only; returns true when it changed.
     bool syncCombinedMaterial();
 
-    IParamBlock2* params() const { return pblock; }
+    IParamBlock2* params() const
+    {
+        return pblock;
+    }
 
     // --- Animatable --------------------------------------------------------------------------
-    void DeleteThis() override { delete this; }
-    Class_ID ClassID() override { return OPENSCATTER_CLASS_ID; }
-    SClass_ID SuperClassID() override { return GEOMOBJECT_CLASS_ID; }
-    void GetClassName(MSTR& s, bool) const override { s = _T("OpenScatter"); }
-    int NumSubs() override { return 1; }
-    Animatable* SubAnim(int) override { return pblock; }
-    MSTR SubAnimName(int, bool) override { return _T("Parameters"); }
-    int NumParamBlocks() override { return 1; }
-    IParamBlock2* GetParamBlock(int) override { return pblock; }
-    IParamBlock2* GetParamBlockByID(BlockID id) override { return (pblock && pblock->ID() == id) ? pblock : nullptr; }
-    void* GetInterface(ULONG id) override { return GeomObject::GetInterface(id); }
+    void DeleteThis() override
+    {
+        delete this;
+    }
+    Class_ID ClassID() override
+    {
+        return OPENSCATTER_CLASS_ID;
+    }
+    SClass_ID SuperClassID() override
+    {
+        return GEOMOBJECT_CLASS_ID;
+    }
+    void GetClassName(MSTR& s, bool) const override
+    {
+        s = _T("OpenScatter");
+    }
+    int NumSubs() override
+    {
+        return 1;
+    }
+    Animatable* SubAnim(int) override
+    {
+        return pblock;
+    }
+    MSTR SubAnimName(int, bool) override
+    {
+        return _T("Parameters");
+    }
+    int NumParamBlocks() override
+    {
+        return 1;
+    }
+    IParamBlock2* GetParamBlock(int) override
+    {
+        return pblock;
+    }
+    IParamBlock2* GetParamBlockByID(BlockID id) override
+    {
+        return (pblock && pblock->ID() == id) ? pblock : nullptr;
+    }
+    void* GetInterface(ULONG id) override
+    {
+        return GeomObject::GetInterface(id);
+    }
     BaseInterface* GetInterface(Interface_ID id) override;
     void BeginEditParams(IObjParam* ip, ULONG flags, Animatable* prev) override;
     void EndEditParams(IObjParam* ip, ULONG flags, Animatable* next) override;
 
     // --- ReferenceMaker / ReferenceTarget ----------------------------------------------------
-    int NumRefs() override { return 1; }
-    RefTargetHandle GetReference(int) override { return pblock; }
-    void SetReference(int, RefTargetHandle r) override { pblock = static_cast<IParamBlock2*>(r); }
+    int NumRefs() override
+    {
+        return 1;
+    }
+    RefTargetHandle GetReference(int) override
+    {
+        return pblock;
+    }
+    void SetReference(int, RefTargetHandle r) override
+    {
+        pblock = static_cast<IParamBlock2*>(r);
+    }
     RefResult NotifyRefChanged(const Interval& changeInt, RefTargetHandle hTarget, PartID& partID, RefMessage message,
                                BOOL propagate) override;
     RefTargetHandle Clone(RemapDir& remap) override;
@@ -132,7 +195,10 @@ public:
 
     // --- BaseObject --------------------------------------------------------------------------
     CreateMouseCallBack* GetCreateMouseCallBack() override;
-    const MCHAR* GetObjectName(bool) const override { return _T("OpenScatter"); }
+    const MCHAR* GetObjectName(bool) const override
+    {
+        return _T("OpenScatter");
+    }
     int Display(TimeValue t, INode* inode, ViewExp* vpt, int flags) override;
     int HitTest(TimeValue t, INode* inode, int type, int crossing, int flags, IPoint2* p, ViewExp* vpt) override;
     void GetWorldBoundBox(TimeValue t, INode* inode, ViewExp* vpt, Box3& box) override;
@@ -144,11 +210,23 @@ public:
                             MaxSDK::Graphics::IRenderItemContainer& container) override;
 
     // --- Object ------------------------------------------------------------------------------
-    ObjectState Eval(TimeValue) override { return ObjectState(this); }
+    ObjectState Eval(TimeValue) override
+    {
+        return ObjectState(this);
+    }
     Interval ObjectValidity(TimeValue t) override;
-    void InitNodeName(MSTR& s) override { s = _T("OpenScatter"); }
-    int IsRenderable() override { return TRUE; }
-    int IsDeformable() override { return FALSE; }
+    void InitNodeName(MSTR& s) override
+    {
+        s = _T("OpenScatter");
+    }
+    int IsRenderable() override
+    {
+        return TRUE;
+    }
+    int IsDeformable() override
+    {
+        return FALSE;
+    }
     int CanConvertToType(Class_ID obtype) override;
     Object* ConvertToType(TimeValue t, Class_ID obtype) override;
     void GetDeformBBox(TimeValue t, Box3& box, Matrix3* tm, BOOL useSel) override;
@@ -172,7 +250,7 @@ public:
     int fnGetInstanceModel(int index) override;
     MSTR fnGetVersion() override;
 
-private:
+  private:
     void refreshModels(TimeValue t);
     void refreshScatter(TimeValue t);
     // The aggregate mesh of every instance (thinned by rank to stay within "maxFaces"), with its
@@ -188,11 +266,11 @@ private:
     std::atomic<bool> m_modelsDirty{ true };
     Interval m_scatterValid = NEVER;
     Interval m_modelsValid = NEVER;
-    std::vector<float> m_engineWeights;   // the model weights the current instances were made with
-    std::uint64_t m_scatterRuns = 0;      // how many times the engine ran, and the models were read:
-    std::uint64_t m_modelRuns = 0;        // lets a test see that nothing is recomputed without a reason
+    std::vector<float> m_engineWeights; // the model weights the current instances were made with
+    std::uint64_t m_scatterRuns = 0;    // how many times the engine ran, and the models were read:
+    std::uint64_t m_modelRuns = 0;      // lets a test see that nothing is recomputed without a reason
 
-    Mesh m_aggregate;                     // what GetRenderMesh returned last
+    Mesh m_aggregate; // what GetRenderMesh returned last
     Mesh m_empty;
     RenderReport m_report;
 

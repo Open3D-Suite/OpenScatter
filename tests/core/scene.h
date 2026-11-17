@@ -55,19 +55,25 @@ inline osc::Image densityMap(std::uint64_t seed = 12)
     for (int y = 0; y < 128; ++y)
         for (int x = 0; x < 128; ++x)
             image.pixels[static_cast<std::size_t>(y * 128 + x)] = osc::clamp01(
-                (osc::tools::fbm(static_cast<float>(x) / 128.0f * 4.0f, static_cast<float>(y) / 128.0f * 4.0f, seed) - 0.3f) * 2.5f);
+                (osc::tools::fbm(static_cast<float>(x) / 128.0f * 4.0f, static_cast<float>(y) / 128.0f * 4.0f, seed) -
+                 0.3f) *
+                2.5f);
     return image;
 }
 
 // A terrain of 400 x 400 with hills up to 60 high, with texture coordinates.
-inline osc::TriMesh terrain() { return osc::tools::makeTerrain(400.0f, 96, 60.0f, 21, true); }
+inline osc::TriMesh terrain()
+{
+    return osc::tools::makeTerrain(400.0f, 96, 60.0f, 21, true);
+}
 
 // The settings of the scene. The surface, the areas and the map are the caller's, and must outlive
 // the scatter.
-inline osc::ScatterSettings settings(const osc::SurfaceIndex& surface, const osc::AreaSet& areaSet, const osc::Image& map)
+inline osc::ScatterSettings settings(const osc::SurfaceIndex& surface, const osc::AreaSet& areaSet,
+                                     const osc::Image& map)
 {
     osc::ScatterSettings s;
-    s.tileSize = 64.0f;   // 16 384 points per tile: up to 4 per square unit
+    s.tileSize = 64.0f; // 16 384 points per tile: up to 4 per square unit
     s.density = 2.0f;
     s.seed = 2026;
     s.surface = &surface;

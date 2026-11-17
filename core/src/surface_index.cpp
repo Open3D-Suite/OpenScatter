@@ -51,8 +51,7 @@ void SurfaceIndex::build(TriMesh mesh)
 
     const std::vector<Vec3>& verts = m_mesh.vertices;
     const std::vector<std::uint32_t>& idx = m_mesh.indices;
-    const std::size_t numTris =
-        std::min<std::size_t>(idx.size() / 3, std::numeric_limits<std::uint32_t>::max());
+    const std::size_t numTris = std::min<std::size_t>(idx.size() / 3, std::numeric_limits<std::uint32_t>::max());
 
     // 1. The triangles that can be hit from above, and their extent.
     std::vector<std::uint32_t> usable;
@@ -75,10 +74,10 @@ void SurfaceIndex::build(TriMesh mesh)
         const Vec3& c = verts[i2];
         if (!isFinite(a) || !isFinite(b) || !isFinite(c))
             continue;
-        const double det = (static_cast<double>(b.x) - a.x) * (static_cast<double>(c.y) - a.y)
-                         - (static_cast<double>(c.x) - a.x) * (static_cast<double>(b.y) - a.y);
+        const double det = (static_cast<double>(b.x) - a.x) * (static_cast<double>(c.y) - a.y) -
+                           (static_cast<double>(c.x) - a.x) * (static_cast<double>(b.y) - a.y);
         if (!(det != 0.0))
-            continue;   // seen from above it is a line or a point
+            continue; // seen from above it is a line or a point
         usable.push_back(static_cast<std::uint32_t>(t));
         for (const Vec3* v : { &a, &b, &c })
         {
@@ -100,7 +99,7 @@ void SurfaceIndex::build(TriMesh mesh)
 
     // 2. A grid with about one cell for every two triangles, made coarser while the triangles would
     //    need more references than the budget allows.
-    const double extentX = static_cast<double>(maxX) - minX;   // both above 0: some triangle has area
+    const double extentX = static_cast<double>(maxX) - minX; // both above 0: some triangle has area
     const double extentY = static_cast<double>(maxY) - minY;
     const double wanted = std::max(1.0, static_cast<double>(m_usable) * 0.5);
     const double cell = std::sqrt(extentX * extentY / wanted);
@@ -119,8 +118,8 @@ void SurfaceIndex::build(TriMesh mesh)
     };
     std::vector<CellRange> ranges(m_usable);
 
-    const std::uint64_t budget = std::min<std::uint64_t>(
-        kReferencesPerTriangle * m_usable + 4096, std::numeric_limits<std::uint32_t>::max());
+    const std::uint64_t budget =
+        std::min<std::uint64_t>(kReferencesPerTriangle * m_usable + 4096, std::numeric_limits<std::uint32_t>::max());
     for (;;)
     {
         m_scaleX = static_cast<double>(m_nx) / extentX;
@@ -173,7 +172,7 @@ bool SurfaceIndex::project(float x, float y, SurfaceHit& hit) const
     if (m_usable == 0)
         return false;
     if (!(x >= m_bounds.minX && x <= m_bounds.maxX && y >= m_bounds.minY && y <= m_bounds.maxY))
-        return false;   // also when x or y is not a number
+        return false; // also when x or y is not a number
 
     const std::vector<Vec3>& verts = m_mesh.vertices;
     const std::vector<std::uint32_t>& idx = m_mesh.indices;
@@ -196,7 +195,7 @@ bool SurfaceIndex::project(float x, float y, SurfaceHit& hit) const
         const double e1y = static_cast<double>(b.y) - a.y;
         const double e2x = static_cast<double>(c.x) - a.x;
         const double e2y = static_cast<double>(c.y) - a.y;
-        const double det = e1x * e2y - e2x * e1y;   // never 0: build() left those out
+        const double det = e1x * e2y - e2x * e1y; // never 0: build() left those out
         const double dx = px - a.x;
         const double dy = py - a.y;
         const double u = (dx * e2y - e2x * dy) / det;
@@ -227,7 +226,7 @@ bool SurfaceIndex::project(float x, float y, SurfaceHit& hit) const
     const double e2z = static_cast<double>(c.z) - a.z;
     double nx = e1y * e2z - e1z * e2y;
     double ny = e1z * e2x - e1x * e2z;
-    double nz = e1x * e2y - e1y * e2x;   // the same "det": never 0
+    double nz = e1x * e2y - e1y * e2x; // the same "det": never 0
     const double inv = (nz < 0.0 ? -1.0 : 1.0) / std::sqrt(nx * nx + ny * ny + nz * nz);
     nx *= inv;
     ny *= inv;

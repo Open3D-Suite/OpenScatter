@@ -40,8 +40,8 @@ struct Kept
     std::size_t common = 0;
     std::size_t samePosition = 0;
     std::size_t sameModel = 0;
-    std::size_t sameAxes = 0;       // rotation and scale together
-    std::size_t sameLengths = 0;    // scale alone
+    std::size_t sameAxes = 0;    // rotation and scale together
+    std::size_t sameLengths = 0; // scale alone
 };
 
 Kept compare(const osc::ScatterResult& before, const osc::ScatterResult& after)
@@ -58,11 +58,16 @@ Kept compare(const osc::ScatterResult& before, const osc::ScatterResult& after)
             ++k.common;
             k.samePosition += helpers::sameBits(a.transform.t, b.transform.t) ? 1 : 0;
             k.sameModel += a.model == b.model ? 1 : 0;
-            k.sameAxes += (helpers::sameBits(a.transform.x, b.transform.x) && helpers::sameBits(a.transform.y, b.transform.y)
-                           && helpers::sameBits(a.transform.z, b.transform.z)) ? 1 : 0;
-            k.sameLengths += (std::fabs(osc::length(a.transform.x) - osc::length(b.transform.x)) < 1e-5f
-                              && std::fabs(osc::length(a.transform.y) - osc::length(b.transform.y)) < 1e-5f
-                              && std::fabs(osc::length(a.transform.z) - osc::length(b.transform.z)) < 1e-5f) ? 1 : 0;
+            k.sameAxes +=
+                (helpers::sameBits(a.transform.x, b.transform.x) && helpers::sameBits(a.transform.y, b.transform.y) &&
+                 helpers::sameBits(a.transform.z, b.transform.z))
+                    ? 1
+                    : 0;
+            k.sameLengths += (std::fabs(osc::length(a.transform.x) - osc::length(b.transform.x)) < 1e-5f &&
+                              std::fabs(osc::length(a.transform.y) - osc::length(b.transform.y)) < 1e-5f &&
+                              std::fabs(osc::length(a.transform.z) - osc::length(b.transform.z)) < 1e-5f)
+                                 ? 1
+                                 : 0;
         }
     return k;
 }
@@ -77,7 +82,7 @@ TEST_CASE("stability: raising the density only adds instances")
     const osc::ScatterResult low = sc.scatter(s);
     s.density = 1.6f;
     const osc::ScatterResult mid = sc.scatter(s);
-    s.density = 4.0f;   // all of the pattern
+    s.density = 4.0f; // all of the pattern
     const osc::ScatterResult high = sc.scatter(s);
 
     REQUIRE(low.count() > 5000);
@@ -116,7 +121,7 @@ TEST_CASE("stability: editing an area leaves the rest alone")
     CHECK(osc::hashInstances(before) != osc::hashInstances(after));
     const helpers::Survivors kept = survivors(before, after);
     CHECK(kept.kept > before.count() * 8 / 10);
-    CHECK(kept.identical == kept.kept);   // whoever is in both is the same, bit for bit
+    CHECK(kept.identical == kept.kept); // whoever is in both is the same, bit for bit
 
     // Away from both positions of the clearing (and its falloff) nothing was added or removed.
     const auto farFromEdit = [](const osc::Instance& inst) {
@@ -161,7 +166,7 @@ TEST_CASE("stability: adding and removing areas")
     const osc::ScatterResult fewer = sc.scatter(s);
     CHECK(fewer.count() < before.count());
     helpers::Survivors kept = survivors(fewer, before);
-    CHECK(kept.kept == fewer.count());        // nothing new appeared
+    CHECK(kept.kept == fewer.count()); // nothing new appeared
     CHECK(kept.identical == fewer.count());
 
     // No areas at all: everything that was there still is.
@@ -248,7 +253,7 @@ TEST_CASE("stability: reseeding one aspect changes only that aspect")
         CHECK(k.common == n);
         CHECK(k.samePosition == n);
         CHECK(k.sameAxes == n);
-        CHECK(k.sameModel < n * 6 / 10);   // three models at 3 : 1 : 2: about 39 % keep theirs by chance
+        CHECK(k.sameModel < n * 6 / 10); // three models at 3 : 1 : 2: about 39 % keep theirs by chance
         CHECK(k.sameModel > n * 2 / 10);
     }
     SUBCASE("rotation")
@@ -277,7 +282,8 @@ TEST_CASE("stability: reseeding one aspect changes only that aspect")
         for (const osc::Instance& a : helpers::flatten(before))
         {
             const osc::Instance& b = later.at(a.id);
-            const float cosine = osc::dot(a.transform.z, b.transform.z) / (osc::length(a.transform.z) * osc::length(b.transform.z));
+            const float cosine =
+                osc::dot(a.transform.z, b.transform.z) / (osc::length(a.transform.z) * osc::length(b.transform.z));
             REQUIRE(cosine > 0.99999f);
         }
     }

@@ -30,6 +30,9 @@ inline std::uint64_t hashCombine(std::uint64_t a, std::uint64_t b)
 }
 
 // A float in [0, 1) from the top 24 bits of a hash: every value is exact, and 1 is never returned.
-inline float unitFloat(std::uint64_t h) { return static_cast<float>(h >> 40) * (1.0f / 16777216.0f); }
+inline float unitFloat(std::uint64_t h)
+{
+    return static_cast<float>(h >> 40) * (1.0f / 16777216.0f);
+}
 
 } // namespace osc

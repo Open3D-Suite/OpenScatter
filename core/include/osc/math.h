@@ -25,22 +25,49 @@ struct Vec3
     float z = 0.0f;
 };
 
-inline Vec3 operator+(Vec3 a, Vec3 b) { return { a.x + b.x, a.y + b.y, a.z + b.z }; }
-inline Vec3 operator-(Vec3 a, Vec3 b) { return { a.x - b.x, a.y - b.y, a.z - b.z }; }
-inline Vec3 operator*(Vec3 a, float s) { return { a.x * s, a.y * s, a.z * s }; }
-inline float dot(Vec3 a, Vec3 b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
+inline Vec3 operator+(Vec3 a, Vec3 b)
+{
+    return { a.x + b.x, a.y + b.y, a.z + b.z };
+}
+inline Vec3 operator-(Vec3 a, Vec3 b)
+{
+    return { a.x - b.x, a.y - b.y, a.z - b.z };
+}
+inline Vec3 operator*(Vec3 a, float s)
+{
+    return { a.x * s, a.y * s, a.z * s };
+}
+inline float dot(Vec3 a, Vec3 b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
 inline Vec3 cross(Vec3 a, Vec3 b)
 {
     return { a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x };
 }
-inline float length(Vec3 a) { return std::sqrt(dot(a, a)); }
+inline float length(Vec3 a)
+{
+    return std::sqrt(dot(a, a));
+}
 
-inline bool isFinite(float v) { return std::isfinite(v); }
-inline bool isFinite(Vec2 v) { return std::isfinite(v.x) && std::isfinite(v.y); }
-inline bool isFinite(Vec3 v) { return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z); }
+inline bool isFinite(float v)
+{
+    return std::isfinite(v);
+}
+inline bool isFinite(Vec2 v)
+{
+    return std::isfinite(v.x) && std::isfinite(v.y);
+}
+inline bool isFinite(Vec3 v)
+{
+    return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z);
+}
 
 // 0 for anything that is not above 0 (including NaN), 1 for anything above 1.
-inline float clamp01(float v) { return !(v > 0.0f) ? 0.0f : (v > 1.0f ? 1.0f : v); }
+inline float clamp01(float v)
+{
+    return !(v > 0.0f) ? 0.0f : (v > 1.0f ? 1.0f : v);
+}
 
 // An axis-aligned rectangle in the XY plane. Empty when max < min on either axis.
 struct Rect
@@ -50,7 +77,10 @@ struct Rect
     float maxX = -1.0f;
     float maxY = -1.0f;
 
-    bool empty() const { return !(maxX >= minX && maxY >= minY); }
+    bool empty() const
+    {
+        return !(maxX >= minX && maxY >= minY);
+    }
     bool finite() const
     {
         return std::isfinite(minX) && std::isfinite(minY) && std::isfinite(maxX) && std::isfinite(maxY);
@@ -93,6 +123,9 @@ struct Transform
     Vec3 t{ 0.0f, 0.0f, 0.0f };
 };
 
-inline Vec3 apply(const Transform& m, Vec3 p) { return m.x * p.x + m.y * p.y + m.z * p.z + m.t; }
+inline Vec3 apply(const Transform& m, Vec3 p)
+{
+    return m.x * p.x + m.y * p.y + m.z * p.z + m.t;
+}
 
 } // namespace osc

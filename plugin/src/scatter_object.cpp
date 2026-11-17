@@ -27,16 +27,43 @@ namespace
 
 class OpenScatterClassDesc : public ClassDesc2
 {
-public:
-    int IsPublic() override { return TRUE; }
-    void* Create(BOOL loading) override { return new OpenScatterObject(loading); }
-    const MCHAR* ClassName() override { return _T("OpenScatter"); }
-    const MCHAR* NonLocalizedClassName() override { return _T("OpenScatter"); }
-    SClass_ID SuperClassID() override { return GEOMOBJECT_CLASS_ID; }
-    Class_ID ClassID() override { return OPENSCATTER_CLASS_ID; }
-    const MCHAR* Category() override { return _T("Open3D"); }
-    const MCHAR* InternalName() override { return _T("OpenScatter"); }
-    HINSTANCE HInstance() override { return hInstance; }
+  public:
+    int IsPublic() override
+    {
+        return TRUE;
+    }
+    void* Create(BOOL loading) override
+    {
+        return new OpenScatterObject(loading);
+    }
+    const MCHAR* ClassName() override
+    {
+        return _T("OpenScatter");
+    }
+    const MCHAR* NonLocalizedClassName() override
+    {
+        return _T("OpenScatter");
+    }
+    SClass_ID SuperClassID() override
+    {
+        return GEOMOBJECT_CLASS_ID;
+    }
+    Class_ID ClassID() override
+    {
+        return OPENSCATTER_CLASS_ID;
+    }
+    const MCHAR* Category() override
+    {
+        return _T("Open3D");
+    }
+    const MCHAR* InternalName() override
+    {
+        return _T("OpenScatter");
+    }
+    HINSTANCE HInstance() override
+    {
+        return hInstance;
+    }
 };
 
 OpenScatterClassDesc g_scatterDesc;
@@ -45,8 +72,11 @@ OpenScatterClassDesc g_scatterDesc;
 // either would make the scatter one of its own inputs.
 class NodeValidator : public PBValidator
 {
-public:
-    BOOL Validate(PB2Value&) override { return TRUE; }
+  public:
+    BOOL Validate(PB2Value&) override
+    {
+        return TRUE;
+    }
     BOOL Validate(PB2Value& v, ReferenceMaker* owner, ParamID, int) override
     {
         INode* node = static_cast<INode*>(v.r);
@@ -208,7 +238,7 @@ const osc::Pattern& defaultPattern()
 // A View for GetRenderMesh calls made outside a render.
 class NullView : public View
 {
-public:
+  public:
     NullView()
     {
         worldToView.IdentityMatrix();
@@ -220,10 +250,16 @@ public:
         pixelSize = 1.0f;
         flags = 0;
     }
-    Point2 ViewToScreen(Point3 p) override { return Point2(p.x, p.y); }
+    Point2 ViewToScreen(Point3 p) override
+    {
+        return Point2(p.x, p.y);
+    }
 };
 
-bool finite(const Point3& p) { return std::isfinite(p.x) && std::isfinite(p.y) && std::isfinite(p.z); }
+bool finite(const Point3& p)
+{
+    return std::isfinite(p.x) && std::isfinite(p.y) && std::isfinite(p.z);
+}
 
 // Copies the mesh a renderer would get from the node into "out", in the node's object space.
 bool copyRenderMesh(INode* node, TimeValue t, Mesh& out, Interval& valid)
@@ -284,7 +320,7 @@ void appendSurface(INode* node, TimeValue t, osc::TriMesh& out, Interval& valid)
         for (int v = 0; v < numVerts; ++v)
         {
             const Point3 p = mesh.verts[v] * tm;
-            out.vertices.push_back({ p.x, p.y, p.z });   // not finite: the engine skips its triangles
+            out.vertices.push_back({ p.x, p.y, p.z }); // not finite: the engine skips its triangles
         }
         out.indices.reserve(out.indices.size() + static_cast<std::size_t>(numFaces) * 3);
         for (int f = 0; f < numFaces; ++f)
@@ -299,11 +335,16 @@ const MCHAR* routeName(RenderRoute route)
 {
     switch (route)
     {
-    case kRouteAuto: return _T("auto");
-    case kRouteInstancing: return _T("instancing");
-    case kRouteParticleFlow: return _T("particleFlow");
-    case kRouteMesh: return _T("mesh");
-    default: return _T("none");
+    case kRouteAuto:
+        return _T("auto");
+    case kRouteInstancing:
+        return _T("instancing");
+    case kRouteParticleFlow:
+        return _T("particleFlow");
+    case kRouteMesh:
+        return _T("mesh");
+    default:
+        return _T("none");
     }
 }
 
@@ -317,9 +358,15 @@ MSTR widen(const char* text)
 
 } // namespace
 
-ClassDesc2* getOpenScatterDesc() { return &g_scatterDesc; }
+ClassDesc2* getOpenScatterDesc()
+{
+    return &g_scatterDesc;
+}
 
-FPInterfaceDesc* IOpenScatter::GetDesc() { return &g_scatterInterface; }
+FPInterfaceDesc* IOpenScatter::GetDesc()
+{
+    return &g_scatterInterface;
+}
 
 int materialSlotsOf(Mtl* mtl)
 {
@@ -357,7 +404,7 @@ float rankThreshold(const InstanceBuffer& buffer, std::size_t keep)
     for (std::size_t i = 0; i < n; ++i)
         ranks[i] = buffer.instances[i].rank;
     std::nth_element(ranks.begin(), ranks.begin() + static_cast<std::ptrdiff_t>(keep), ranks.end());
-    return ranks[keep];   // instances with a rank below this one: at most "keep"
+    return ranks[keep]; // instances with a rank below this one: at most "keep"
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -384,7 +431,9 @@ void OpenScatterObject::BeginEditParams(IObjParam*, ULONG, Animatable*)
     // No rollouts yet: every parameter is set from MAXScript or Python.
 }
 
-void OpenScatterObject::EndEditParams(IObjParam*, ULONG, Animatable*) {}
+void OpenScatterObject::EndEditParams(IObjParam*, ULONG, Animatable*)
+{
+}
 
 BaseInterface* OpenScatterObject::GetInterface(Interface_ID id)
 {
@@ -397,7 +446,8 @@ BaseInterface* OpenScatterObject::GetInterface(Interface_ID id)
     return GeomObject::GetInterface(id);
 }
 
-RefResult OpenScatterObject::NotifyRefChanged(const Interval&, RefTargetHandle hTarget, PartID&, RefMessage message, BOOL)
+RefResult OpenScatterObject::NotifyRefChanged(const Interval&, RefTargetHandle hTarget, PartID&, RefMessage message,
+                                              BOOL)
 {
     if (hTarget != pblock || !pblock)
         return REF_SUCCEED;
@@ -562,7 +612,7 @@ void OpenScatterObject::refreshModels(TimeValue t)
     for (std::size_t i = 0; i < models.size(); ++i)
         engineWeights[i] = models[i].weight;
     if (engineWeights != m_engineWeights)
-        m_scatterDirty = true;   // which model each instance gets depends on the weights
+        m_scatterDirty = true; // which model each instance gets depends on the weights
 
     m_buffer.models = std::move(models);
     ++m_buffer.version.models;
@@ -633,8 +683,8 @@ void OpenScatterObject::refreshScatter(TimeValue t)
         if (full > 0.0f && std::isfinite(full))
         {
             int exponent = 0;
-            std::frexp(full, &exponent);            // full = m * 2^exponent, m in [0.5, 1)
-            tileSize = std::ldexp(1.0f, exponent - 1);   // the power of two at or below "full"
+            std::frexp(full, &exponent);               // full = m * 2^exponent, m in [0.5, 1)
+            tileSize = std::ldexp(1.0f, exponent - 1); // the power of two at or below "full"
         }
     }
 
@@ -687,7 +737,8 @@ void OpenScatterObject::refreshScatter(TimeValue t)
         if (!index.empty())
         {
             settings.surface = &index;
-            osc::ScatterResult result = osc::scatterPlanar(pattern, settings, static_cast<unsigned>(threads < 0 ? 0 : threads));
+            osc::ScatterResult result =
+                osc::scatterPlanar(pattern, settings, static_cast<unsigned>(threads < 0 ? 0 : threads));
             buffer.status = result.status;
             buffer.stats = result.stats;
             if (result.status == osc::ScatterStatus::Ok)
@@ -698,7 +749,7 @@ void OpenScatterObject::refreshScatter(TimeValue t)
                     for (std::vector<osc::Instance>& tile : result.tiles)
                     {
                         buffer.instances.insert(buffer.instances.end(), tile.begin(), tile.end());
-                        std::vector<osc::Instance>().swap(tile);   // give the block back as we go
+                        std::vector<osc::Instance>().swap(tile); // give the block back as we go
                     }
                 }
                 catch (const std::bad_alloc&)
@@ -897,13 +948,11 @@ MSTR OpenScatterObject::fnGetStatistics()
                 _T("patternShare=%.4f densityClamped=%d limited=%d tileSize=%g densityPerUnit2=%g ")
                 _T("surfaceTriangles=%llu models=%d seconds=%.4f scatterRuns=%llu modelRuns=%llu"),
                 static_cast<unsigned long long>(m_buffer.instances.size()),
-                static_cast<unsigned long long>(s.candidates),
-                static_cast<unsigned long long>(s.rejectedOffSurface),
+                static_cast<unsigned long long>(s.candidates), static_cast<unsigned long long>(s.rejectedOffSurface),
                 static_cast<unsigned long long>(s.rejectedBySlope),
-                static_cast<unsigned long long>(s.rejectedByAltitude),
-                static_cast<double>(s.patternShare), s.densityClamped ? 1 : 0, s.limited ? 1 : 0,
-                static_cast<double>(m_buffer.tileSize), static_cast<double>(m_buffer.engineDensity),
-                static_cast<unsigned long long>(m_buffer.surfaceTriangles),
+                static_cast<unsigned long long>(s.rejectedByAltitude), static_cast<double>(s.patternShare),
+                s.densityClamped ? 1 : 0, s.limited ? 1 : 0, static_cast<double>(m_buffer.tileSize),
+                static_cast<double>(m_buffer.engineDensity), static_cast<unsigned long long>(m_buffer.surfaceTriangles),
                 static_cast<int>(m_buffer.models.size()), m_buffer.seconds,
                 static_cast<unsigned long long>(m_scatterRuns), static_cast<unsigned long long>(m_modelRuns));
     return text;

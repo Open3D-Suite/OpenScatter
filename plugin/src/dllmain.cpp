@@ -75,9 +75,12 @@ __declspec(dllexport) ClassDesc* LibClassDesc(int i)
 {
     switch (i)
     {
-    case 0: return oscmax::getOpenScatterDesc();
-    case 1: return oscmax::getOpenScatterOperatorDesc();
-    default: return nullptr;
+    case 0:
+        return oscmax::getOpenScatterDesc();
+    case 1:
+        return oscmax::getOpenScatterOperatorDesc();
+    default:
+        return nullptr;
     }
 }
 

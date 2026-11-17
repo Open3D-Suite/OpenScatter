@@ -16,6 +16,7 @@ install.
 The Open3D launcher's publishing script runs this file in a clean export of a release tag and zips
 dist/OpenScatter.bundle itself.
 """
+
 import argparse
 import hashlib
 import os
@@ -39,7 +40,9 @@ def build(max_sdk):
     cmd = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(ROOT / "build.ps1"), "-Plugin"]
     if max_sdk:
         cmd += ["-MaxSdk", max_sdk]
-    result = subprocess.run(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors="replace")
+    result = subprocess.run(
+        cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors="replace"
+    )
     found = re.search(r"^Bundle \(([0-9.]+)\): (.+)$", result.stdout, re.MULTILINE)
     if result.returncode != 0 or not found:
         sys.stderr.write(result.stdout)

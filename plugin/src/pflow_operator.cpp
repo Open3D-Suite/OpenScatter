@@ -31,8 +31,14 @@
 namespace oscmax
 {
 
-enum { kOperatorParamBlock = 0 };
-enum { kOpScatter = 0 };
+enum
+{
+    kOperatorParamBlock = 0
+};
+enum
+{
+    kOpScatter = 0
+};
 
 namespace
 {
@@ -40,7 +46,13 @@ namespace
 // How a rotation matrix becomes the quaternion Particle Flow expects in its orientation channel.
 // The known-good conversion is the one decomp_affine gives; building a Quat straight from the
 // matrix is far cheaper, so its convention is checked against decomp_affine once.
-enum class QuatMode { Unknown, Direct, Inverse, Decompose };
+enum class QuatMode
+{
+    Unknown,
+    Direct,
+    Inverse,
+    Decompose
+};
 
 QuatMode findQuatMode()
 {
@@ -102,12 +114,18 @@ void decompose(const Matrix3& tm, QuatMode mode, Point3& position, Quat& orienta
 
 class OpenScatterOperator : public PFSimpleOperator
 {
-public:
+  public:
     OpenScatterOperator();
 
     // Animatable
-    void GetClassName(MSTR& s, bool) const override { s = _T("OpenScatterOperator"); }
-    Class_ID ClassID() override { return OPENSCATTER_OPERATOR_CLASS_ID; }
+    void GetClassName(MSTR& s, bool) const override
+    {
+        s = _T("OpenScatterOperator");
+    }
+    Class_ID ClassID() override
+    {
+        return OPENSCATTER_OPERATOR_CLASS_ID;
+    }
     void BeginEditParams(IObjParam* ip, ULONG flags, Animatable* prev) override;
     void EndEditParams(IObjParam* ip, ULONG flags, Animatable* next) override;
 
@@ -115,13 +133,22 @@ public:
     RefTargetHandle Clone(RemapDir& remap) override;
 
     // BaseObject
-    const MCHAR* GetObjectName(bool) const override { return _T("OpenScatterOperator"); }
+    const MCHAR* GetObjectName(bool) const override
+    {
+        return _T("OpenScatterOperator");
+    }
 
     // IPFAction
     const ParticleChannelMask& ChannelsUsed(const Interval& time) const override;
     const Interval ActivityInterval() const override;
-    bool IsFertile() const override { return true; }   // it creates its particles itself
-    bool IsMaterialHolder() const override { return true; }
+    bool IsFertile() const override
+    {
+        return true;
+    } // it creates its particles itself
+    bool IsMaterialHolder() const override
+    {
+        return true;
+    }
     Mtl* GetMaterial() override;
 
     // IPFOperator
@@ -130,15 +157,21 @@ public:
 
     ClassDesc* GetClassDesc() const override;
 
-    INode* scatterNode() const { return pblock() ? pblock()->GetINode(kOpScatter, 0) : nullptr; }
+    INode* scatterNode() const
+    {
+        return pblock() ? pblock()->GetINode(kOpScatter, 0) : nullptr;
+    }
 
     // Whether a render started now must find particles here, and whether the last evaluation gave
     // any. Particle Flow keeps its particles from one render to the next when none of its actions
     // changed - and a change of renderer changes none - so the two can disagree: see refreshOperator.
     bool wouldEmit() const;
-    bool lastEmit() const { return m_lastEmit; }
+    bool lastEmit() const
+    {
+        return m_lastEmit;
+    }
 
-private:
+  private:
     bool m_lastEmit = false;
 };
 
@@ -147,39 +180,74 @@ namespace
 
 class OpenScatterOperatorDesc : public ClassDesc2
 {
-public:
-    int IsPublic() override { return 0; }
-    void* Create(BOOL) override { return new OpenScatterOperator(); }
-    const MCHAR* ClassName() override { return _T("OpenScatterOperator"); }
-    const MCHAR* NonLocalizedClassName() override { return _T("OpenScatterOperator"); }
-    SClass_ID SuperClassID() override { return HELPER_CLASS_ID; }
-    Class_ID ClassID() override { return OPENSCATTER_OPERATOR_CLASS_ID; }
-    Class_ID SubClassID() override { return PFOperatorSubClassID; }
-    const MCHAR* Category() override { return _T("Particle Flow"); }
-    const MCHAR* InternalName() override { return _T("OpenScatterOperator"); }
-    HINSTANCE HInstance() override { return hInstance; }
+  public:
+    int IsPublic() override
+    {
+        return 0;
+    }
+    void* Create(BOOL) override
+    {
+        return new OpenScatterOperator();
+    }
+    const MCHAR* ClassName() override
+    {
+        return _T("OpenScatterOperator");
+    }
+    const MCHAR* NonLocalizedClassName() override
+    {
+        return _T("OpenScatterOperator");
+    }
+    SClass_ID SuperClassID() override
+    {
+        return HELPER_CLASS_ID;
+    }
+    Class_ID ClassID() override
+    {
+        return OPENSCATTER_OPERATOR_CLASS_ID;
+    }
+    Class_ID SubClassID() override
+    {
+        return PFOperatorSubClassID;
+    }
+    const MCHAR* Category() override
+    {
+        return _T("Particle Flow");
+    }
+    const MCHAR* InternalName() override
+    {
+        return _T("OpenScatterOperator");
+    }
+    HINSTANCE HInstance() override
+    {
+        return hInstance;
+    }
 
     INT_PTR Execute(int cmd, ULONG_PTR arg1, ULONG_PTR, ULONG_PTR) override
     {
-        static MCHAR description[] = _T("Carries the instances of an OpenScatter object. Created and kept by OpenScatter.");
+        static MCHAR description[] =
+            _T("Carries the instances of an OpenScatter object. Created and kept by OpenScatter.");
         static MCHAR category[] = _T("Operator");
         switch (cmd)
         {
         case kPF_GetActionDescription:
-            if (!arg1) return 0;
+            if (!arg1)
+                return 0;
             *reinterpret_cast<MCHAR**>(arg1) = description;
             return 1;
         case kPF_PViewPublic:
             // Not offered in Particle View's depot: OpenScatter builds the carrier itself.
-            if (!arg1) return 0;
+            if (!arg1)
+                return 0;
             *reinterpret_cast<bool*>(arg1) = false;
             return 1;
         case kPF_PViewCategory:
-            if (!arg1) return 0;
+            if (!arg1)
+                return 0;
             *reinterpret_cast<MCHAR**>(arg1) = category;
             return 1;
         case kPF_IsFertile:
-            if (!arg1) return 0;
+            if (!arg1)
+                return 0;
             *reinterpret_cast<bool*>(arg1) = true;
             return 1;
         default:
@@ -214,7 +282,10 @@ Interface* ensureChannel(IChannelContainer* container, Interface_ID writeID, Cla
 
 } // namespace
 
-ClassDesc2* getOpenScatterOperatorDesc() { return &g_operatorDesc; }
+ClassDesc2* getOpenScatterOperatorDesc()
+{
+    return &g_operatorDesc;
+}
 
 // Particle Flow starts simulating one step before the earliest moment a birth action is active, and
 // proceeds from there to the time asked, a frame at a time. The interval must therefore begin at a
@@ -233,7 +304,10 @@ OpenScatterOperator::OpenScatterOperator()
     GetClassDesc()->MakeAutoParamBlocks(this);
 }
 
-ClassDesc* OpenScatterOperator::GetClassDesc() const { return &g_operatorDesc; }
+ClassDesc* OpenScatterOperator::GetClassDesc() const
+{
+    return &g_operatorDesc;
+}
 
 void OpenScatterOperator::BeginEditParams(IObjParam* ip, ULONG flags, Animatable* prev)
 {
@@ -255,9 +329,8 @@ RefTargetHandle OpenScatterOperator::Clone(RemapDir& remap)
 
 const ParticleChannelMask& OpenScatterOperator::ChannelsUsed(const Interval&) const
 {
-    static ParticleChannelMask mask(PCU_Amount,
-                                    PCU_Amount | PCU_New | PCU_ID | PCU_Time | PCU_BirthTime | PCU_Position |
-                                        PCU_Orientation | PCU_Scale | PCU_Shape);
+    static ParticleChannelMask mask(PCU_Amount, PCU_Amount | PCU_New | PCU_ID | PCU_Time | PCU_BirthTime |
+                                                    PCU_Position | PCU_Orientation | PCU_Scale | PCU_Shape);
     return mask;
 }
 
@@ -269,8 +342,8 @@ Mtl* OpenScatterOperator::GetMaterial()
     return scatter ? scatter->combinedMaterial() : nullptr;
 }
 
-bool OpenScatterOperator::Proceed(IObject* pCont, PreciseTimeValue timeStart, PreciseTimeValue& timeEnd, Object* pSystem,
-                                  INode* systemNode, INode* actionNode, IPFIntegrator*)
+bool OpenScatterOperator::Proceed(IObject* pCont, PreciseTimeValue timeStart, PreciseTimeValue& timeEnd,
+                                  Object* pSystem, INode* systemNode, INode* actionNode, IPFIntegrator*)
 {
     IParticleChannelAmountR* chAmountR = GetParticleChannelAmountRInterface(pCont);
     IParticleChannelAmountW* chAmountW = GetParticleChannelAmountWInterface(pCont);
@@ -303,8 +376,8 @@ bool OpenScatterOperator::Proceed(IObject* pCont, PreciseTimeValue timeStart, Pr
     const int wanted = buffer ? static_cast<int>(std::min<std::size_t>(buffer->instances.size(), INT_MAX / 2)) : 0;
     int amount = chAmountR->Count();
     if (logEnabled())
-        logLine("pflow Proceed (%d, %d] render=%d emit=%d particles=%d wanted=%d", static_cast<int>(TimeValue(timeStart)), t,
-                renderState ? 1 : 0, emit ? 1 : 0, amount, wanted);
+        logLine("pflow Proceed (%d, %d] render=%d emit=%d particles=%d wanted=%d",
+                static_cast<int>(TimeValue(timeStart)), t, renderState ? 1 : 0, emit ? 1 : 0, amount, wanted);
 
     // --- make the number of particles match: the last ones go, or new ones are born ---
     if (amount > wanted)
@@ -324,16 +397,18 @@ bool OpenScatterOperator::Proceed(IObject* pCont, PreciseTimeValue timeStart, Pr
         const int born = std::min(wanted - amount, std::max(0, allowance - generated));
         if (born > 0)
         {
-            IParticleChannelNewW* chNew = static_cast<IParticleChannelNewW*>(chCont->EnsureInterface(
-                PARTICLECHANNELNEWW_INTERFACE, ParticleChannelNew_Class_ID, false, Interface_ID(0, 0), Interface_ID(0, 0)));
-            IParticleChannelIDW* chID = static_cast<IParticleChannelIDW*>(chCont->EnsureInterface(
-                PARTICLECHANNELIDW_INTERFACE, ParticleChannelID_Class_ID, false, Interface_ID(0, 0), Interface_ID(0, 0)));
-            IParticleChannelPTVW* chTime = static_cast<IParticleChannelPTVW*>(chCont->EnsureInterface(
-                PARTICLECHANNELTIMEW_INTERFACE, ParticleChannelPTV_Class_ID, true, PARTICLECHANNELTIMER_INTERFACE,
-                PARTICLECHANNELTIMEW_INTERFACE));
-            IParticleChannelPTVW* chBirth = static_cast<IParticleChannelPTVW*>(chCont->EnsureInterface(
-                PARTICLECHANNELBIRTHTIMEW_INTERFACE, ParticleChannelPTV_Class_ID, true, PARTICLECHANNELBIRTHTIMER_INTERFACE,
-                PARTICLECHANNELBIRTHTIMEW_INTERFACE));
+            IParticleChannelNewW* chNew = static_cast<IParticleChannelNewW*>(
+                chCont->EnsureInterface(PARTICLECHANNELNEWW_INTERFACE, ParticleChannelNew_Class_ID, false,
+                                        Interface_ID(0, 0), Interface_ID(0, 0)));
+            IParticleChannelIDW* chID = static_cast<IParticleChannelIDW*>(
+                chCont->EnsureInterface(PARTICLECHANNELIDW_INTERFACE, ParticleChannelID_Class_ID, false,
+                                        Interface_ID(0, 0), Interface_ID(0, 0)));
+            IParticleChannelPTVW* chTime = static_cast<IParticleChannelPTVW*>(
+                chCont->EnsureInterface(PARTICLECHANNELTIMEW_INTERFACE, ParticleChannelPTV_Class_ID, true,
+                                        PARTICLECHANNELTIMER_INTERFACE, PARTICLECHANNELTIMEW_INTERFACE));
+            IParticleChannelPTVW* chBirth = static_cast<IParticleChannelPTVW*>(
+                chCont->EnsureInterface(PARTICLECHANNELBIRTHTIMEW_INTERFACE, ParticleChannelPTV_Class_ID, true,
+                                        PARTICLECHANNELBIRTHTIMER_INTERFACE, PARTICLECHANNELBIRTHTIMEW_INTERFACE));
             if (!chNew || !chID || !chTime || !chBirth)
                 return false;
             const int first = amount;
@@ -359,8 +434,9 @@ bool OpenScatterOperator::Proceed(IObject* pCont, PreciseTimeValue timeStart, Pr
     // --- particle i is instance i ---
     IParticleChannelPoint3W* chPos = ensureChannel<IParticleChannelPoint3W>(
         chCont, PARTICLECHANNELPOSITIONW_INTERFACE, ParticleChannelPoint3_Class_ID, PARTICLECHANNELPOSITIONR_INTERFACE);
-    IParticleChannelQuatW* chOrient = ensureChannel<IParticleChannelQuatW>(
-        chCont, PARTICLECHANNELORIENTATIONW_INTERFACE, ParticleChannelQuat_Class_ID, PARTICLECHANNELORIENTATIONR_INTERFACE);
+    IParticleChannelQuatW* chOrient =
+        ensureChannel<IParticleChannelQuatW>(chCont, PARTICLECHANNELORIENTATIONW_INTERFACE,
+                                             ParticleChannelQuat_Class_ID, PARTICLECHANNELORIENTATIONR_INTERFACE);
     IParticleChannelPoint3W* chScale = ensureChannel<IParticleChannelPoint3W>(
         chCont, PARTICLECHANNELSCALEW_INTERFACE, ParticleChannelPoint3_Class_ID, PARTICLECHANNELSCALER_INTERFACE);
     IParticleChannelMeshW* chMesh = ensureChannel<IParticleChannelMeshW>(
@@ -373,7 +449,8 @@ bool OpenScatterOperator::Proceed(IObject* pCont, PreciseTimeValue timeStart, Pr
     {
         Point3 position, scale;
         Quat orientation;
-        decompose(toMatrix3(buffer->instances[static_cast<std::size_t>(i)].transform), quatMode, position, orientation, scale);
+        decompose(toMatrix3(buffer->instances[static_cast<std::size_t>(i)].transform), quatMode, position, orientation,
+                  scale);
         chPos->SetValue(i, position);
         chOrient->SetValue(i, orientation);
         chScale->SetValue(i, scale);

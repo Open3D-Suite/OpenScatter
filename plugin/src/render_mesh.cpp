@@ -13,7 +13,8 @@
 namespace oscmax
 {
 
-std::pair<std::uint64_t, std::uint64_t> OpenScatterObject::buildAggregate(Mesh& out, const Matrix3& worldToObject, int maxFaces)
+std::pair<std::uint64_t, std::uint64_t> OpenScatterObject::buildAggregate(Mesh& out, const Matrix3& worldToObject,
+                                                                          int maxFaces)
 {
     const InstanceBuffer& buffer = m_buffer;
     out.setNumVerts(0);
@@ -41,15 +42,17 @@ std::pair<std::uint64_t, std::uint64_t> OpenScatterObject::buildAggregate(Mesh& 
     };
     // A Mesh counts its vertices and faces with an int.
     const std::uint64_t hardLimit = 0x7fffffffull / 4;
-    const std::uint64_t limit = maxFaces > 0 ? std::min<std::uint64_t>(static_cast<std::uint64_t>(maxFaces), hardLimit) : hardLimit;
+    const std::uint64_t limit =
+        maxFaces > 0 ? std::min<std::uint64_t>(static_cast<std::uint64_t>(maxFaces), hardLimit) : hardLimit;
     float threshold = 2.0f;
     std::uint64_t faces = 0, verts = 0, kept = 0;
     countFaces(threshold, faces, verts, kept);
     std::size_t keep = numInstances;
     for (int pass = 0; pass < 64 && (faces > limit || verts > hardLimit) && keep > 0; ++pass)
     {
-        const double ratio = std::min(static_cast<double>(limit) / static_cast<double>(faces),
-                                      static_cast<double>(hardLimit) / static_cast<double>(std::max<std::uint64_t>(verts, 1)));
+        const double ratio =
+            std::min(static_cast<double>(limit) / static_cast<double>(faces),
+                     static_cast<double>(hardLimit) / static_cast<double>(std::max<std::uint64_t>(verts, 1)));
         keep = static_cast<std::size_t>(static_cast<double>(kept) * std::min(ratio, 1.0) * 0.98);
         threshold = rankThreshold(buffer, keep);
         countFaces(threshold, faces, verts, kept);
@@ -59,7 +62,8 @@ std::pair<std::uint64_t, std::uint64_t> OpenScatterObject::buildAggregate(Mesh& 
 
     bool anyUVs = false;
     for (const ModelData& model : buffer.models)
-        anyUVs = anyUVs || (model.mesh.getNumFaces() > 0 && model.mesh.mapSupport(1) && model.mesh.getNumMapVerts(1) > 0);
+        anyUVs =
+            anyUVs || (model.mesh.getNumFaces() > 0 && model.mesh.mapSupport(1) && model.mesh.getNumMapVerts(1) > 0);
     std::uint64_t mapVertsTotal = 0;
     if (anyUVs)
     {
@@ -112,7 +116,7 @@ std::pair<std::uint64_t, std::uint64_t> OpenScatterObject::buildAggregate(Mesh& 
         const TVFace* srcMapFaces = srcUVs ? src.mapFaces(1) : nullptr;
         for (int f = 0; f < nf; ++f)
         {
-            Face face = src.faces[f];   // smoothing group, edge visibility and material slot come along
+            Face face = src.faces[f]; // smoothing group, edge visibility and material slot come along
             face.v[0] += static_cast<DWORD>(v0);
             face.v[1] += static_cast<DWORD>(v0);
             face.v[2] += static_cast<DWORD>(v0);
@@ -120,7 +124,8 @@ std::pair<std::uint64_t, std::uint64_t> OpenScatterObject::buildAggregate(Mesh& 
             if (mapFaces)
             {
                 if (srcMapFaces)
-                    mapFaces[f0 + f].setTVerts(static_cast<DWORD>(t0) + srcMapFaces[f].t[0], static_cast<DWORD>(t0) + srcMapFaces[f].t[1],
+                    mapFaces[f0 + f].setTVerts(static_cast<DWORD>(t0) + srcMapFaces[f].t[0],
+                                               static_cast<DWORD>(t0) + srcMapFaces[f].t[1],
                                                static_cast<DWORD>(t0) + srcMapFaces[f].t[2]);
                 else
                     mapFaces[f0 + f].setTVerts(static_cast<DWORD>(t0), static_cast<DWORD>(t0), static_cast<DWORD>(t0));

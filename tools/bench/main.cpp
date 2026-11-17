@@ -37,7 +37,7 @@ struct Measured
 {
     std::size_t instances = 0;
     std::uint64_t hash = 0;
-    double seconds = 0.0;   // the best of the runs
+    double seconds = 0.0; // the best of the runs
     osc::ScatterStatus status = osc::ScatterStatus::Ok;
 };
 
@@ -122,8 +122,8 @@ int main(int argc, char** argv)
         {
             const float n = osc::tools::fbm((static_cast<float>(x) + 0.5f) / static_cast<float>(map.width) * 5.0f,
                                             (static_cast<float>(y) + 0.5f) / static_cast<float>(map.height) * 5.0f, 5);
-            map.pixels[static_cast<std::size_t>(y) * static_cast<std::size_t>(map.width) + static_cast<std::size_t>(x)] =
-                osc::clamp01((n - 0.35f) * 3.0f);
+            map.pixels[static_cast<std::size_t>(y) * static_cast<std::size_t>(map.width) +
+                       static_cast<std::size_t>(x)] = osc::clamp01((n - 0.35f) * 3.0f);
         }
 
     // Areas: everything inside a big circle, except a road with soft shoulders and three clearings.
@@ -132,7 +132,7 @@ int main(int argc, char** argv)
         osc::Area meadow;
         meadow.mode = osc::AreaMode::Include;
         meadow.shapes.push_back(circle(500.0f, 500.0f, 480.0f, 256));
-        meadow.falloffNear = -40.0f;   // thins out over the last 40 units before its edge
+        meadow.falloffNear = -40.0f; // thins out over the last 40 units before its edge
         areaList.push_back(meadow);
 
         osc::Area road;
@@ -175,7 +175,7 @@ int main(int argc, char** argv)
 
     const auto base = [&](float perUnit) {
         osc::ScatterSettings s;
-        s.tileSize = osc::tileSizeForDensity(patternPoints, perUnit);   // the whole pattern = that density
+        s.tileSize = osc::tileSizeForDensity(patternPoints, perUnit); // the whole pattern = that density
         s.density = perUnit;
         s.surface = &surface;
         s.modelWeights = { 1.0f, 1.0f, 1.0f };
@@ -275,7 +275,8 @@ int main(int argc, char** argv)
         const double gigabytes = static_cast<double>(rows[4].many.instances) * sizeof(osc::Instance) / 1e9;
         const bool ok = gigabytes < 1.0;
         targets = targets && ok;
-        std::printf("buffer for ten million instances: %.2f GB (target < 1 GB: %s)\n", gigabytes, ok ? "met" : "MISSED");
+        std::printf("buffer for ten million instances: %.2f GB (target < 1 GB: %s)\n", gigabytes,
+                    ok ? "met" : "MISSED");
     }
     std::printf("identical with 1 and %u threads, and stable when the density rises: %s\n", threads,
                 identical ? "yes" : "NO");

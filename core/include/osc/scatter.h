@@ -36,8 +36,8 @@ struct Range
 
 enum class MapSpace
 {
-    SurfaceUV,   // sampled at the texture coordinates of the surface under the candidate
-    PlanarXY,    // the image covers a rectangle of the XY plane
+    SurfaceUV, // sampled at the texture coordinates of the surface under the candidate
+    PlanarXY,  // the image covers a rectangle of the XY plane
 };
 
 // A baked map that scales the density: 0 (black) = nothing, 1 (white) = the full density.
@@ -45,9 +45,9 @@ enum class MapSpace
 // SurfaceUV and there is no surface with texture coordinates, or PlanarXY with an empty rectangle.
 struct DensityMap
 {
-    const Image* image = nullptr;   // not owned; null = no map
+    const Image* image = nullptr; // not owned; null = no map
     MapSpace space = MapSpace::SurfaceUV;
-    Rect rect;                      // PlanarXY only
+    Rect rect; // PlanarXY only
     Wrap wrap = Wrap::Clamp;
 };
 
@@ -55,11 +55,11 @@ struct DensityMap
 // of the instance's id, so the values survive any change to density, areas or maps.
 struct TransformSettings
 {
-    float alignToNormal = 0.0f;                             // 0: stands along "up"; 1: along the surface normal
-    Range rotationDegrees[3] = { {}, {}, { 0.0f, 360.0f } };   // about the instance's own X, Y and Z
+    float alignToNormal = 0.0f;                              // 0: stands along "up"; 1: along the surface normal
+    Range rotationDegrees[3] = { {}, {}, { 0.0f, 360.0f } }; // about the instance's own X, Y and Z
     Range scale[3] = { { 1.0f, 1.0f }, { 1.0f, 1.0f }, { 1.0f, 1.0f } };
-    bool uniformScale = true;                               // one factor for the three axes, from scale[0]
-    Range translation[3] = {};                              // along the instance's axes before its rotation
+    bool uniformScale = true;  // one factor for the three axes, from scale[0]
+    Range translation[3] = {}; // along the instance's axes before its rotation
 };
 
 struct ScatterSettings
@@ -82,15 +82,15 @@ struct ScatterSettings
     std::uint64_t maxInstances = 0;
 
     // --- inputs (not owned; they must outlive the call) ---
-    const SurfaceIndex* surface = nullptr;   // null = flat ground at z = 0
+    const SurfaceIndex* surface = nullptr; // null = flat ground at z = 0
     const AreaSet* areas = nullptr;
     DensityMap densityMap;
 
     // --- surface filters ---
-    Vec3 up{ 0.0f, 0.0f, 1.0f };   // the vertical, for slope, altitude and orientation
-    float upOffset = 0.0f;         // altitude of the origin: altitude = dot(position, up) + upOffset
+    Vec3 up{ 0.0f, 0.0f, 1.0f }; // the vertical, for slope, altitude and orientation
+    float upOffset = 0.0f;       // altitude of the origin: altitude = dot(position, up) + upOffset
     bool limitSlope = false;
-    float slopeMinDegrees = 0.0f;  // angle between the surface normal and "up"
+    float slopeMinDegrees = 0.0f; // angle between the surface normal and "up"
     float slopeMaxDegrees = 90.0f;
     bool limitAltitude = false;
     float altitudeMin = 0.0f;
@@ -112,19 +112,19 @@ struct ScatterSettings
 
 struct Instance
 {
-    Transform transform;   // in the scatter's local space
+    Transform transform; // in the scatter's local space
     std::uint64_t id = 0;
-    float rank = 0.0f;     // keep those below a threshold to thin the result evenly
+    float rank = 0.0f; // keep those below a threshold to thin the result evenly
     std::uint32_t model = 0;
 };
 
 enum class ScatterStatus
 {
-    Ok,                // also when there turned out to be nothing to scatter
+    Ok, // also when there turned out to be nothing to scatter
     EmptyPattern,
-    InvalidSettings,   // tile size or density is not a usable number, or the domain is not finite
-    NoDomain,          // no domain given and nothing to take it from
-    TooManyTiles,      // the domain is too large for this tile size
+    InvalidSettings, // tile size or density is not a usable number, or the domain is not finite
+    NoDomain,        // no domain given and nothing to take it from
+    TooManyTiles,    // the domain is too large for this tile size
     OutOfMemory,
 };
 
@@ -133,17 +133,17 @@ const char* statusMessage(ScatterStatus status);
 
 struct ScatterStats
 {
-    std::uint64_t candidates = 0;           // pattern points inside the domain and below the density
+    std::uint64_t candidates = 0; // pattern points inside the domain and below the density
     std::uint64_t rejectedByAreas = 0;
     std::uint64_t rejectedByMap = 0;
-    std::uint64_t rejectedOffSurface = 0;   // nothing under them
+    std::uint64_t rejectedOffSurface = 0; // nothing under them
     std::uint64_t rejectedBySlope = 0;
     std::uint64_t rejectedByAltitude = 0;
     std::uint64_t instances = 0;
-    float patternShare = 0.0f;              // the part of the pattern in use (1 = all of it)
-    bool densityClamped = false;            // more density asked than the pattern holds at this tile size
-    bool limited = false;                   // thinned to stay within maxInstances
-    bool mapIgnored = false;                // a density map was given but could not be used
+    float patternShare = 0.0f;   // the part of the pattern in use (1 = all of it)
+    bool densityClamped = false; // more density asked than the pattern holds at this tile size
+    bool limited = false;        // thinned to stay within maxInstances
+    bool mapIgnored = false;     // a density map was given but could not be used
 };
 
 // The largest number of tiles one scatter may cover.

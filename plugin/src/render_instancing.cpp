@@ -23,28 +23,61 @@ namespace
 
 class Target : public RenderInstanceTarget
 {
-public:
+  public:
     Matrix3 tm;
     __int64 id = 0;
     int numTMs = 1;
 
-    void* GetCustomData(ChannelID) const override { return nullptr; }
-    float GetCustomInt(ChannelID) const override { return 0.0f; }
-    float GetCustomFloat(ChannelID) const override { return 0.0f; }
-    Point3 GetCustomVector(ChannelID) const override { return Point3(0.0f, 0.0f, 0.0f); }
-    Color GetCustomColor(ChannelID) const override { return Color(0.0f, 0.0f, 0.0f); }
+    void* GetCustomData(ChannelID) const override
+    {
+        return nullptr;
+    }
+    float GetCustomInt(ChannelID) const override
+    {
+        return 0.0f;
+    }
+    float GetCustomFloat(ChannelID) const override
+    {
+        return 0.0f;
+    }
+    Point3 GetCustomVector(ChannelID) const override
+    {
+        return Point3(0.0f, 0.0f, 0.0f);
+    }
+    Color GetCustomColor(ChannelID) const override
+    {
+        return Color(0.0f, 0.0f, 0.0f);
+    }
     Matrix3 GetCustomTM(ChannelID) const override
     {
         Matrix3 m;
         m.IdentityMatrix();
         return m;
     }
-    __int64 GetID() const override { return id; }
-    __int64 GetInstanceID() const override { return id; }
-    bool GetLife(float&, float&) const override { return false; }
-    Mtl* GetMtlOverride() const override { return nullptr; }
-    MaxSDK::Array<InstanceMatIDInfo> GetMatIDOverrides() const override { return MaxSDK::Array<InstanceMatIDInfo>(); }
-    MaxSDK::Array<InstanceUVWInfo> GetUVWOverrides() const override { return MaxSDK::Array<InstanceUVWInfo>(); }
+    __int64 GetID() const override
+    {
+        return id;
+    }
+    __int64 GetInstanceID() const override
+    {
+        return id;
+    }
+    bool GetLife(float&, float&) const override
+    {
+        return false;
+    }
+    Mtl* GetMtlOverride() const override
+    {
+        return nullptr;
+    }
+    MaxSDK::Array<InstanceMatIDInfo> GetMatIDOverrides() const override
+    {
+        return MaxSDK::Array<InstanceMatIDInfo>();
+    }
+    MaxSDK::Array<InstanceUVWInfo> GetUVWOverrides() const override
+    {
+        return MaxSDK::Array<InstanceUVWInfo>();
+    }
     MaxSDK::Array<Matrix3> GetTMs() const override
     {
         // The instances do not move: the same transform as many times as the renderer asked for.
@@ -53,9 +86,18 @@ public:
             tms.append(tm);
         return tms;
     }
-    Matrix3 GetTM() const override { return tm; }
-    Point3 GetVelocity() const override { return Point3(0.0f, 0.0f, 0.0f); }
-    AngAxis GetSpin() const override { return AngAxis(Point3(0.0f, 0.0f, 1.0f), 0.0f); }
+    Matrix3 GetTM() const override
+    {
+        return tm;
+    }
+    Point3 GetVelocity() const override
+    {
+        return Point3(0.0f, 0.0f, 0.0f);
+    }
+    AngAxis GetSpin() const override
+    {
+        return AngAxis(Point3(0.0f, 0.0f, 1.0f), 0.0f);
+    }
 };
 
 } // namespace
@@ -64,21 +106,29 @@ class InstancingAdapter;
 
 class Source : public RenderInstanceSource
 {
-public:
+  public:
     InstancingAdapter* adapter = nullptr;
     std::size_t model = 0;
 
-    DataFlags GetFlags() const override { return df_inode; }
+    DataFlags GetFlags() const override
+    {
+        return df_inode;
+    }
     void* GetData() const override;
-    int GetVelocityMapChannel() const override { return -1; }
+    int GetVelocityMapChannel() const override
+    {
+        return -1;
+    }
     size_t GetNumInstanceTargets() const override;
     const RenderInstanceTarget* GetRenderInstanceTarget(size_t index) const override;
 };
 
 class InstancingAdapter : public RenderTimeInstancingInterface
 {
-public:
-    explicit InstancingAdapter(OpenScatterObject* owner) : m_owner(owner) {}
+  public:
+    explicit InstancingAdapter(OpenScatterObject* owner) : m_owner(owner)
+    {
+    }
 
     void UpdateInstanceData(TimeValue t, Interval& valid, MotionBlurInfo& mbinfo, const View&, const TSTR&) override
     {
@@ -110,22 +160,39 @@ public:
         valid &= m_owner->validity();
     }
 
-    void ReleaseInstanceData() override {}
+    void ReleaseInstanceData() override
+    {
+    }
 
-    MaxSDK::Array<ChannelInfo> GetChannels() const override { return MaxSDK::Array<ChannelInfo>(); }
+    MaxSDK::Array<ChannelInfo> GetChannels() const override
+    {
+        return MaxSDK::Array<ChannelInfo>();
+    }
     // The interface declares this with the TypeID of the namespace, not ChannelInfo::TypeID.
-    ChannelID GetChannelID(const TSTR&, MaxSDK::RenderTimeInstancing::TypeID) const override { return -1; }
+    ChannelID GetChannelID(const TSTR&, MaxSDK::RenderTimeInstancing::TypeID) const override
+    {
+        return -1;
+    }
 
-    size_t GetNumInstanceSources() const override { return m_sources.size(); }
+    size_t GetNumInstanceSources() const override
+    {
+        return m_sources.size();
+    }
     const RenderInstanceSource* GetRenderInstanceSource(size_t index) const override
     {
         return index < m_sources.size() ? &m_sources[index] : nullptr;
     }
 
-    OpenScatterObject* owner() const { return m_owner; }
-    int numTMs() const { return m_numTMs; }
+    OpenScatterObject* owner() const
+    {
+        return m_owner;
+    }
+    int numTMs() const
+    {
+        return m_numTMs;
+    }
 
-private:
+  private:
     OpenScatterObject* m_owner;
     std::vector<Source> m_sources;
     int m_numTMs = 1;

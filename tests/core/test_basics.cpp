@@ -124,8 +124,8 @@ TEST_CASE("image: bilinear sampling")
     osc::Image image;
     image.width = 2;
     image.height = 2;
-    image.pixels = { 0.0f, 1.0f,     // row at v = 0.25
-                     2.0f, 3.0f };   // row at v = 0.75
+    image.pixels = { 0.0f, 1.0f,   // row at v = 0.25
+                     2.0f, 3.0f }; // row at v = 0.75
 
     SUBCASE("pixel centres give the pixels")
     {
@@ -161,7 +161,7 @@ TEST_CASE("image: bilinear sampling")
         CHECK(osc::sampleBilinear(broken, 0.5f, 0.5f, osc::Wrap::Clamp) == 0.0f);
         broken.width = 4;
         broken.height = 4;
-        broken.pixels = { 1.0f };   // not 16 values
+        broken.pixels = { 1.0f }; // not 16 values
         CHECK_FALSE(broken.valid());
         CHECK(osc::sampleBilinear(broken, 0.5f, 0.5f, osc::Wrap::Clamp) == 0.0f);
         broken.width = -4;
@@ -199,8 +199,10 @@ TEST_CASE("parallel: every index once, for any thread count")
 
 TEST_CASE("parallel: an exception in a worker comes back to the caller")
 {
-    CHECK_THROWS_AS(osc::parallelFor(100, 8, [](std::size_t i, unsigned) {
-        if (i == 37)
-            throw std::runtime_error("boom");
-    }), std::runtime_error);
+    CHECK_THROWS_AS(osc::parallelFor(100, 8,
+                                     [](std::size_t i, unsigned) {
+                                         if (i == 37)
+                                             throw std::runtime_error("boom");
+                                     }),
+                    std::runtime_error);
 }

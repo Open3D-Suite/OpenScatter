@@ -82,7 +82,8 @@ osc::Polyline star(float cx, float cy, float radius, int points, std::uint64_t s
     {
         double s = 0.0, c = 1.0;
         osc::sinCosTurns(static_cast<double>(i) / points, s, c);
-        const float r = radius * (0.35f + 0.65f * osc::unitFloat(osc::hashCombine(seed, static_cast<std::uint64_t>(i))));
+        const float r =
+            radius * (0.35f + 0.65f * osc::unitFloat(osc::hashCombine(seed, static_cast<std::uint64_t>(i))));
         ring.points.push_back({ cx + r * static_cast<float>(c), cy + r * static_cast<float>(s) });
     }
     return ring;
@@ -151,28 +152,28 @@ TEST_CASE("areas: includes add up, excludes take away from the sum")
         area(AreaMode::Include, { rectangle(18.0f, 0.0f, 40.0f, 10.0f) }),
         area(AreaMode::Exclude, { rectangle(35.0f, 5.0f, 50.0f, 20.0f) }),
     });
-    CHECK(set.weight(5.0f, 5.0f) == 1.0f);     // first include only
-    CHECK(set.weight(19.0f, 5.0f) == 0.0f);    // both includes, but excluded
-    CHECK(set.weight(30.0f, 5.5f) == 1.0f);    // second include only
+    CHECK(set.weight(5.0f, 5.0f) == 1.0f);  // first include only
+    CHECK(set.weight(19.0f, 5.0f) == 0.0f); // both includes, but excluded
+    CHECK(set.weight(30.0f, 5.5f) == 1.0f); // second include only
     CHECK(set.weight(37.0f, 2.0f) == 1.0f);
-    CHECK(set.weight(37.0f, 7.0f) == 0.0f);    // second exclude
-    CHECK(set.weight(45.0f, 2.0f) == 0.0f);    // in no include
+    CHECK(set.weight(37.0f, 7.0f) == 0.0f); // second exclude
+    CHECK(set.weight(45.0f, 2.0f) == 0.0f); // in no include
     const osc::Rect bounds = set.includeBounds();
     CHECK(bounds.minX <= 0.0f);
     CHECK(bounds.maxX >= 40.0f);
-    CHECK(bounds.maxX < 40.01f);               // the exclude areas do not count
+    CHECK(bounds.maxX < 40.01f); // the exclude areas do not count
 }
 
 TEST_CASE("areas: a shape inside another makes a hole, shapes apart are both in")
 {
-    const osc::AreaSet ring({ area(AreaMode::Include, { rectangle(0.0f, 0.0f, 30.0f, 30.0f),
-                                                        rectangle(10.0f, 10.0f, 20.0f, 20.0f) }) });
+    const osc::AreaSet ring(
+        { area(AreaMode::Include, { rectangle(0.0f, 0.0f, 30.0f, 30.0f), rectangle(10.0f, 10.0f, 20.0f, 20.0f) }) });
     CHECK(ring.weight(5.0f, 5.0f) == 1.0f);
     CHECK(ring.weight(15.0f, 15.0f) == 0.0f);
     CHECK(ring.weight(25.0f, 15.0f) == 1.0f);
 
-    const osc::AreaSet islands({ area(AreaMode::Include, { rectangle(0.0f, 0.0f, 10.0f, 10.0f),
-                                                           rectangle(50.0f, 50.0f, 60.0f, 60.0f) }) });
+    const osc::AreaSet islands(
+        { area(AreaMode::Include, { rectangle(0.0f, 0.0f, 10.0f, 10.0f), rectangle(50.0f, 50.0f, 60.0f, 60.0f) }) });
     CHECK(islands.weight(5.0f, 5.0f) == 1.0f);
     CHECK(islands.weight(55.0f, 55.0f) == 1.0f);
     CHECK(islands.weight(30.0f, 30.0f) == 0.0f);
@@ -198,8 +199,8 @@ TEST_CASE("areas: falloff outside the edge")
     CHECK(set.weight(50.0f, -3.0f) == doctest::Approx(0.25f));
     CHECK(set.weight(104.5f, 50.0f) == 0.0f);
     // Beyond a corner the distance is to the corner.
-    CHECK(set.weight(103.0f, 104.0f) == 0.0f);                       // 5 away
-    CHECK(set.weight(101.2f, 101.6f) == doctest::Approx(0.5f));      // 2 away
+    CHECK(set.weight(103.0f, 104.0f) == 0.0f);                  // 5 away
+    CHECK(set.weight(101.2f, 101.6f) == doctest::Approx(0.5f)); // 2 away
     // The bounds reach as far as the falloff.
     CHECK(set.includeBounds().minX <= -4.0f);
     CHECK(set.includeBounds().maxY >= 104.0f);
@@ -214,7 +215,7 @@ TEST_CASE("areas: falloff inside the edge")
     CHECK(set.weight(5.0f, 50.0f) == doctest::Approx(0.5f));
     CHECK(set.weight(50.0f, 97.5f) == doctest::Approx(0.25f));
     CHECK(set.weight(-0.5f, 50.0f) == 0.0f);
-    CHECK(set.weight(3.0f, 4.0f) == doctest::Approx(0.3f));          // near a corner: the closest edge counts
+    CHECK(set.weight(3.0f, 4.0f) == doctest::Approx(0.3f)); // near a corner: the closest edge counts
 }
 
 TEST_CASE("areas: falloff across the edge, and on an exclude area")
@@ -251,7 +252,7 @@ TEST_CASE("areas: open shapes are bands")
         CHECK(road.weight(50.0f, 3.1f) == 1.0f);
         CHECK(road.weight(98.0f, 30.0f) == 0.0f);
         CHECK(road.weight(96.0f, 30.0f) == 1.0f);
-        CHECK(road.weight(-2.0f, 0.0f) == 0.0f);        // round ends
+        CHECK(road.weight(-2.0f, 0.0f) == 0.0f); // round ends
         CHECK(road.weight(-4.0f, 0.0f) == 1.0f);
     }
     SUBCASE("a band with soft shoulders")
@@ -281,7 +282,8 @@ TEST_CASE("areas: open shapes are bands")
     }
     SUBCASE("open and closed shapes in one area")
     {
-        const osc::AreaSet both({ area(AreaMode::Include, { path, rectangle(200.0f, 0.0f, 220.0f, 20.0f) }, 0.0f, 0.0f, 6.0f) });
+        const osc::AreaSet both(
+            { area(AreaMode::Include, { path, rectangle(200.0f, 0.0f, 220.0f, 20.0f) }, 0.0f, 0.0f, 6.0f) });
         CHECK(both.weight(50.0f, 2.0f) == 1.0f);
         CHECK(both.weight(210.0f, 10.0f) == 1.0f);
         CHECK(both.weight(150.0f, 10.0f) == 0.0f);
@@ -327,7 +329,7 @@ TEST_CASE("areas: points that are not numbers or repeat are skipped, the rest of
     const float nan = std::numeric_limits<float>::quiet_NaN();
     const float inf = std::numeric_limits<float>::infinity();
     osc::Polyline messy;
-    messy.points = { { 0.0f, 0.0f }, { 0.0f, 0.0f }, { nan, 5.0f }, { 10.0f, 0.0f }, { 10.0f, inf },
+    messy.points = { { 0.0f, 0.0f },   { 0.0f, 0.0f },   { nan, 5.0f },   { 10.0f, 0.0f }, { 10.0f, inf },
                      { 10.0f, 10.0f }, { 10.0f, 10.0f }, { 0.0f, 10.0f }, { 0.0f, 0.0f } };
     osc::Area a = area(AreaMode::Include, { messy });
     a.width = nan;
@@ -372,7 +374,7 @@ TEST_CASE("areas: the prepared areas agree with the definition")
         else if (falloff == 3)
         {
             a.falloffNear = -3.0f;
-            a.falloffFar = 40.0f;   // longer than most of the shape
+            a.falloffFar = 40.0f; // longer than most of the shape
         }
         else if (falloff == 4)
         {
@@ -400,7 +402,7 @@ TEST_CASE("areas: the prepared areas agree with the definition")
         }
     }
     CHECK(checked == 60 * 1500);
-    CHECK(partial > 2000);   // the falloff zones were really exercised
+    CHECK(partial > 2000); // the falloff zones were really exercised
 }
 
 TEST_CASE("areas: a shape with very many edges, and huge coordinates")
@@ -418,7 +420,7 @@ TEST_CASE("areas: a shape with very many edges, and huge coordinates")
     CHECK(circle.weight(940.0f, 0.0f) == 1.0f);
     CHECK(circle.weight(0.0f, 975.0f) == doctest::Approx(0.5f).epsilon(0.001));
     CHECK(circle.weight(1001.0f, 0.0f) == 0.0f);
-    CHECK(circle.weight(-710.0f, -710.0f) == 0.0f);   // just outside, on the diagonal
+    CHECK(circle.weight(-710.0f, -710.0f) == 0.0f); // just outside, on the diagonal
 
     const float big = 1e30f;
     const osc::AreaSet huge({ area(AreaMode::Include, { rectangle(-big, -big, big, big) }, 0.0f, 1e29f) });

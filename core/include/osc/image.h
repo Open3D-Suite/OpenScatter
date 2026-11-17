@@ -22,19 +22,19 @@ struct Image
 {
     int width = 0;
     int height = 0;
-    std::vector<float> pixels;   // width * height values, row after row
+    std::vector<float> pixels; // width * height values, row after row
 
     bool valid() const
     {
-        return width > 0 && height > 0
-            && pixels.size() == static_cast<std::size_t>(width) * static_cast<std::size_t>(height);
+        return width > 0 && height > 0 &&
+               pixels.size() == static_cast<std::size_t>(width) * static_cast<std::size_t>(height);
     }
 };
 
 enum class Wrap
 {
-    Clamp,    // outside [0, 1] the edge pixels go on for ever
-    Repeat,   // the image tiles
+    Clamp,  // outside [0, 1] the edge pixels go on for ever
+    Repeat, // the image tiles
 };
 
 // The image at (u, v), blended from the four nearest pixels. 0 when the image is not valid or the
@@ -48,7 +48,7 @@ inline float sampleBilinear(const Image& image, float u, float v, Wrap wrap)
         // First into [0, 1], so that the pixel position below cannot overflow.
         const double unit = wrap == Wrap::Repeat ? static_cast<double>(t) - std::floor(static_cast<double>(t))
                                                  : (t < 0.0f ? 0.0 : (t > 1.0f ? 1.0 : static_cast<double>(t)));
-        const double pos = unit * size - 0.5;   // pixel centres are at whole numbers
+        const double pos = unit * size - 0.5; // pixel centres are at whole numbers
         const double base = std::floor(pos);
         blend = static_cast<float>(pos - base);
         const long long a = static_cast<long long>(base);

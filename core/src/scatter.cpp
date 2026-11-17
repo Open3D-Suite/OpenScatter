@@ -30,13 +30,19 @@ constexpr std::uint64_t kTagOffsetX = 0x101;
 constexpr std::uint64_t kTagOffsetY = 0x102;
 constexpr std::uint64_t kTagSymmetry = 0x103;
 constexpr std::uint64_t kTagModel = 0x201;
-constexpr std::uint64_t kTagRotation = 0x301;      // + axis
-constexpr std::uint64_t kTagScale = 0x401;         // + axis
-constexpr std::uint64_t kTagTranslation = 0x501;   // + axis
+constexpr std::uint64_t kTagRotation = 0x301;    // + axis
+constexpr std::uint64_t kTagScale = 0x401;       // + axis
+constexpr std::uint64_t kTagTranslation = 0x501; // + axis
 
-float finiteOr(float v, float fallback) { return std::isfinite(v) ? v : fallback; }
+float finiteOr(float v, float fallback)
+{
+    return std::isfinite(v) ? v : fallback;
+}
 
-Range finiteOr(Range r, float fallback) { return { finiteOr(r.min, fallback), finiteOr(r.max, fallback) }; }
+Range finiteOr(Range r, float fallback)
+{
+    return { finiteOr(r.min, fallback), finiteOr(r.max, fallback) };
+}
 
 float sample(Range r, std::uint64_t key, std::uint64_t tag)
 {
@@ -52,7 +58,7 @@ struct Candidate
 
 enum class Outcome
 {
-    Outside,      // not in the domain: not a candidate at all
+    Outside, // not in the domain: not a candidate at all
     Areas,
     Map,
     OffSurface,
@@ -65,13 +71,13 @@ enum class Outcome
 struct Engine
 {
     // placement
-    std::vector<Vec2> points;   // the part of the pattern in use, mirrored as the seed says
+    std::vector<Vec2> points; // the part of the pattern in use, mirrored as the seed says
     std::vector<float> ranks;
     double tile = 1.0;
     double offsetX = 0.0;
     double offsetY = 0.0;
     Rect domain;
-    float share = 0.0f;         // the rank below which a candidate exists where nothing thins it
+    float share = 0.0f; // the rank below which a candidate exists where nothing thins it
     std::uint64_t idBase = 0;
 
     // density
@@ -86,8 +92,8 @@ struct Engine
     Vec3 up{ 0.0f, 0.0f, 1.0f };
     float upOffset = 0.0f;
     bool limitSlope = false;
-    float slopeCosLow = 0.0f;    // cosine at the largest angle allowed
-    float slopeCosHigh = 0.0f;   // cosine at the smallest
+    float slopeCosLow = 0.0f;  // cosine at the largest angle allowed
+    float slopeCosHigh = 0.0f; // cosine at the smallest
     bool limitAltitude = false;
     float altitudeMin = 0.0f;
     float altitudeMax = 0.0f;
@@ -187,8 +193,8 @@ void Engine::finish(const Candidate& c, std::uint64_t tileKey, std::size_t i, In
     else
     {
         const float u = unitFloat(hashCombine(hashCombine(id, modelSeed), kTagModel));
-        const std::size_t k = static_cast<std::size_t>(
-            std::upper_bound(cumulative.begin(), cumulative.end(), u) - cumulative.begin());
+        const std::size_t k =
+            static_cast<std::size_t>(std::upper_bound(cumulative.begin(), cumulative.end(), u) - cumulative.begin());
         out.model = models[std::min(k, models.size() - 1)];
     }
 
@@ -203,7 +209,7 @@ void Engine::finish(const Candidate& c, std::uint64_t tileKey, std::size_t i, In
             dir = blend * (1.0f / len);
     }
     Vec3 bx{ 1.0f, 0.0f, 0.0f };
-    Vec3 by{ 0.0f, -1.0f, 0.0f };   // straight down: half a turn about X
+    Vec3 by{ 0.0f, -1.0f, 0.0f }; // straight down: half a turn about X
     if (dir.z > -0.999999f)
     {
         const float a = 1.0f / (1.0f + dir.z);
@@ -256,9 +262,9 @@ void Engine::finish(const Candidate& c, std::uint64_t tileKey, std::size_t i, In
     if (moves)
     {
         const std::uint64_t key = hashCombine(id, translationSeed);
-        out.transform.t = out.transform.t + bx * sample(translation[0], key, kTagTranslation + 0)
-                                          + by * sample(translation[1], key, kTagTranslation + 1)
-                                          + bz * sample(translation[2], key, kTagTranslation + 2);
+        out.transform.t = out.transform.t + bx * sample(translation[0], key, kTagTranslation + 0) +
+                          by * sample(translation[1], key, kTagTranslation + 1) +
+                          bz * sample(translation[2], key, kTagTranslation + 2);
     }
 }
 
@@ -290,8 +296,8 @@ void run(const Pattern& pattern, const ScatterSettings& s, unsigned threads, Sca
         result.status = ScatterStatus::EmptyPattern;
         return;
     }
-    if (!(std::isfinite(s.tileSize) && s.tileSize > 0.0f) || !(std::isfinite(s.density) && s.density >= 0.0f)
-        || (!s.domain.empty() && !s.domain.finite()))
+    if (!(std::isfinite(s.tileSize) && s.tileSize > 0.0f) || !(std::isfinite(s.density) && s.density >= 0.0f) ||
+        (!s.domain.empty() && !s.domain.finite()))
     {
         result.status = ScatterStatus::InvalidSettings;
         return;
@@ -327,7 +333,7 @@ void run(const Pattern& pattern, const ScatterSettings& s, unsigned threads, Sca
     result.stats.densityClamped = wantedShare > 1.000001;
     e.share = static_cast<float>(std::min(1.0, wantedShare));
     const auto rankOf = [n](std::size_t i) { return (static_cast<float>(i) + 0.5f) / static_cast<float>(n); };
-    std::size_t limit = 0;   // the first index whose rank is not below the share
+    std::size_t limit = 0; // the first index whose rank is not below the share
     for (std::size_t low = 0, high = n; low < high;)
     {
         const std::size_t mid = low + (high - low) / 2;
@@ -350,9 +356,9 @@ void run(const Pattern& pattern, const ScatterSettings& s, unsigned threads, Sca
     const double fx1 = std::floor((domain.maxX - e.offsetX) / e.tile);
     const double fy1 = std::floor((domain.maxY - e.offsetY) / e.tile);
     const double tileLimit = 1e9;
-    if (!(std::fabs(fx0) < tileLimit && std::fabs(fy0) < tileLimit && std::fabs(fx1) < tileLimit
-          && std::fabs(fy1) < tileLimit)
-        || (fx1 - fx0 + 1.0) * (fy1 - fy0 + 1.0) > static_cast<double>(kMaxTiles))
+    if (!(std::fabs(fx0) < tileLimit && std::fabs(fy0) < tileLimit && std::fabs(fx1) < tileLimit &&
+          std::fabs(fy1) < tileLimit) ||
+        (fx1 - fx0 + 1.0) * (fy1 - fy0 + 1.0) > static_cast<double>(kMaxTiles))
     {
         result.status = ScatterStatus::TooManyTiles;
         return;
@@ -396,8 +402,8 @@ void run(const Pattern& pattern, const ScatterSettings& s, unsigned threads, Sca
     e.surface = s.surface;
     if (isFinite(s.up))
     {
-        const double len = std::sqrt(static_cast<double>(s.up.x) * s.up.x + static_cast<double>(s.up.y) * s.up.y
-                                     + static_cast<double>(s.up.z) * s.up.z);
+        const double len = std::sqrt(static_cast<double>(s.up.x) * s.up.x + static_cast<double>(s.up.y) * s.up.y +
+                                     static_cast<double>(s.up.z) * s.up.z);
         if (len > 1e-12 && std::isfinite(len))
             e.up = { static_cast<float>(s.up.x / len), static_cast<float>(s.up.y / len),
                      static_cast<float>(s.up.z / len) };
@@ -423,7 +429,7 @@ void run(const Pattern& pattern, const ScatterSettings& s, unsigned threads, Sca
             if (std::isfinite(w) && w > 0.0f)
                 total += w;
         if (!(total > 0.0))
-            return;   // every model has probability 0
+            return; // every model has probability 0
         double running = 0.0;
         for (std::size_t m = 0; m < s.modelWeights.size(); ++m)
         {
@@ -434,7 +440,7 @@ void run(const Pattern& pattern, const ScatterSettings& s, unsigned threads, Sca
             e.models.push_back(static_cast<std::uint32_t>(m));
             e.cumulative.push_back(static_cast<float>(running / total));
         }
-        e.cumulative.back() = 2.0f;   // above any value drawn: the last model takes the rest
+        e.cumulative.back() = 2.0f; // above any value drawn: the last model takes the rest
     }
     e.modelSeed = s.modelSeed;
 
@@ -537,12 +543,24 @@ void run(const Pattern& pattern, const ScatterSettings& s, unsigned threads, Sca
             ++candidates;
             switch (outcome)
             {
-            case Outcome::Areas:      ++byAreas; break;
-            case Outcome::Map:        ++byMap; break;
-            case Outcome::OffSurface: ++offSurface; break;
-            case Outcome::Slope:      ++bySlope; break;
-            case Outcome::Altitude:   ++byAltitude; break;
-            default:                  w.accepted.push_back({ c, static_cast<std::uint32_t>(i) }); break;
+            case Outcome::Areas:
+                ++byAreas;
+                break;
+            case Outcome::Map:
+                ++byMap;
+                break;
+            case Outcome::OffSurface:
+                ++offSurface;
+                break;
+            case Outcome::Slope:
+                ++bySlope;
+                break;
+            case Outcome::Altitude:
+                ++byAltitude;
+                break;
+            default:
+                w.accepted.push_back({ c, static_cast<std::uint32_t>(i) });
+                break;
             }
         }
         w.candidates += candidates;
@@ -584,12 +602,18 @@ const char* statusMessage(ScatterStatus status)
 {
     switch (status)
     {
-    case ScatterStatus::Ok:              return "ok";
-    case ScatterStatus::EmptyPattern:    return "the pattern has no points";
-    case ScatterStatus::InvalidSettings: return "the tile size, the density or the domain is not a usable number";
-    case ScatterStatus::NoDomain:        return "there is no domain: no rectangle, no surface and no include area";
-    case ScatterStatus::TooManyTiles:    return "the domain is too large for this tile size";
-    case ScatterStatus::OutOfMemory:     return "out of memory";
+    case ScatterStatus::Ok:
+        return "ok";
+    case ScatterStatus::EmptyPattern:
+        return "the pattern has no points";
+    case ScatterStatus::InvalidSettings:
+        return "the tile size, the density or the domain is not a usable number";
+    case ScatterStatus::NoDomain:
+        return "there is no domain: no rectangle, no surface and no include area";
+    case ScatterStatus::TooManyTiles:
+        return "the domain is too large for this tile size";
+    case ScatterStatus::OutOfMemory:
+        return "out of memory";
     }
     return "unknown";
 }
@@ -621,12 +645,13 @@ std::uint64_t hashInstances(const ScatterResult& result)
         for (const Instance& inst : tile)
         {
             h = hashCombine(h, inst.id);
-            h = hashCombine(h, (static_cast<std::uint64_t>(inst.model) << 32) | std::bit_cast<std::uint32_t>(inst.rank));
+            h = hashCombine(h,
+                            (static_cast<std::uint64_t>(inst.model) << 32) | std::bit_cast<std::uint32_t>(inst.rank));
             const Vec3* vectors[4] = { &inst.transform.x, &inst.transform.y, &inst.transform.z, &inst.transform.t };
             for (const Vec3* v : vectors)
             {
-                h = hashCombine(h, (static_cast<std::uint64_t>(std::bit_cast<std::uint32_t>(v->x)) << 32)
-                                       | std::bit_cast<std::uint32_t>(v->y));
+                h = hashCombine(h, (static_cast<std::uint64_t>(std::bit_cast<std::uint32_t>(v->x)) << 32) |
+                                       std::bit_cast<std::uint32_t>(v->y));
                 h = hashCombine(h, std::bit_cast<std::uint32_t>(v->z));
             }
         }

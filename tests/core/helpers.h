@@ -17,7 +17,10 @@ namespace osc
 {
 
 // So that a failed check prints what the status was.
-inline std::ostream& operator<<(std::ostream& out, ScatterStatus status) { return out << statusMessage(status); }
+inline std::ostream& operator<<(std::ostream& out, ScatterStatus status)
+{
+    return out << statusMessage(status);
+}
 
 } // namespace osc
 
@@ -107,18 +110,18 @@ inline std::unordered_map<std::uint64_t, osc::Instance> byId(const osc::ScatterR
 
 inline bool sameBits(osc::Vec3 a, osc::Vec3 b)
 {
-    return std::bit_cast<std::uint32_t>(a.x) == std::bit_cast<std::uint32_t>(b.x)
-        && std::bit_cast<std::uint32_t>(a.y) == std::bit_cast<std::uint32_t>(b.y)
-        && std::bit_cast<std::uint32_t>(a.z) == std::bit_cast<std::uint32_t>(b.z);
+    return std::bit_cast<std::uint32_t>(a.x) == std::bit_cast<std::uint32_t>(b.x) &&
+           std::bit_cast<std::uint32_t>(a.y) == std::bit_cast<std::uint32_t>(b.y) &&
+           std::bit_cast<std::uint32_t>(a.z) == std::bit_cast<std::uint32_t>(b.z);
 }
 
 // Bit for bit the same instance.
 inline bool same(const osc::Instance& a, const osc::Instance& b)
 {
-    return a.id == b.id && a.model == b.model
-        && std::bit_cast<std::uint32_t>(a.rank) == std::bit_cast<std::uint32_t>(b.rank)
-        && sameBits(a.transform.x, b.transform.x) && sameBits(a.transform.y, b.transform.y)
-        && sameBits(a.transform.z, b.transform.z) && sameBits(a.transform.t, b.transform.t);
+    return a.id == b.id && a.model == b.model &&
+           std::bit_cast<std::uint32_t>(a.rank) == std::bit_cast<std::uint32_t>(b.rank) &&
+           sameBits(a.transform.x, b.transform.x) && sameBits(a.transform.y, b.transform.y) &&
+           sameBits(a.transform.z, b.transform.z) && sameBits(a.transform.t, b.transform.t);
 }
 
 // How many instances of "before" are still in "after", and how many of those are bit for bit the same.

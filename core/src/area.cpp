@@ -44,22 +44,19 @@ std::uint64_t referenceBudget(std::size_t edges)
     return std::min<std::uint64_t>(kReferencesPerEdge * edges + 4096, std::numeric_limits<std::uint32_t>::max());
 }
 
-template <class EdgeT>
-double crossingX(const EdgeT& e, double y)
+template <class EdgeT> double crossingX(const EdgeT& e, double y)
 {
     return e.ax + (y - e.ay) * (static_cast<double>(e.bx) - e.ax) / (static_cast<double>(e.by) - e.ay);
 }
 
 // Whether a ray from a point at height y towards +X can meet the edge. Half-open, so a ray through a
 // vertex counts the two edges that share it once in total.
-template <class EdgeT>
-bool spans(const EdgeT& e, double y)
+template <class EdgeT> bool spans(const EdgeT& e, double y)
 {
     return (e.ay <= y) != (e.by <= y);
 }
 
-template <class EdgeT>
-double distanceSquared(const EdgeT& e, double x, double y)
+template <class EdgeT> double distanceSquared(const EdgeT& e, double x, double y)
 {
     const double ex = static_cast<double>(e.bx) - e.ax;
     const double ey = static_cast<double>(e.by) - e.ay;
@@ -240,8 +237,8 @@ void AreaSet::Compiled::build(const Area& area)
         std::uint64_t references = 0;
         for (const Edge& e : edges)
             if (e.closed)
-                references += bandOf(std::max<double>(e.ay, e.by), minY, rowScale, rows)
-                            - bandOf(std::min<double>(e.ay, e.by), minY, rowScale, rows) + 1;
+                references += bandOf(std::max<double>(e.ay, e.by), minY, rowScale, rows) -
+                              bandOf(std::min<double>(e.ay, e.by), minY, rowScale, rows) + 1;
         if (references <= budget || rows == 1)
             break;
         rows = std::max<std::size_t>(1, rows / 2);
@@ -316,13 +313,13 @@ float AreaSet::Compiled::weight(double x, double y) const
     if (edges.empty())
         return 0.0f;
     if (!(x >= minX && x <= maxX && y >= minY && y <= maxY))
-        return 0.0f;   // out of reach, or not a number
+        return 0.0f; // out of reach, or not a number
 
     const std::size_t cell = bandOf(y, minY, scaleY, ny) * nx + bandOf(x, minX, scaleX, nx);
     const std::uint32_t begin = cellStart[cell];
     const std::uint32_t end = cellStart[cell + 1];
     if (begin == end)
-        return cellInside[cell] ? 1.0f : 0.0f;   // no edge near: deep inside or far outside
+        return cellInside[cell] ? 1.0f : 0.0f; // no edge near: deep inside or far outside
 
     const bool in = inside(x, y);
     if (!needDistance)
@@ -377,8 +374,8 @@ AreaSet::AreaSet(const std::vector<Area>& areas)
         const Compiled& c = m_areas[i];
         if (c.edges.empty())
             continue;
-        m_includeBounds = unite(m_includeBounds, Rect{ outwardDown(c.minX), outwardDown(c.minY),
-                                                       outwardUp(c.maxX), outwardUp(c.maxY) });
+        m_includeBounds = unite(m_includeBounds,
+                                Rect{ outwardDown(c.minX), outwardDown(c.minY), outwardUp(c.maxX), outwardUp(c.maxY) });
     }
 }
 

@@ -54,9 +54,9 @@ TEST_CASE("determinism: the same instances with 1, 4 and 32 threads - every feat
     CHECK(one.stats.rejectedByAltitude > 1000);
     CHECK(one.count() > 20000);
     CHECK_FALSE(one.stats.mapIgnored);
-    CHECK(one.stats.candidates == one.count() + one.stats.rejectedByAreas + one.stats.rejectedByMap
-                                      + one.stats.rejectedOffSurface + one.stats.rejectedBySlope
-                                      + one.stats.rejectedByAltitude);
+    CHECK(one.stats.candidates == one.count() + one.stats.rejectedByAreas + one.stats.rejectedByMap +
+                                      one.stats.rejectedOffSurface + one.stats.rejectedBySlope +
+                                      one.stats.rejectedByAltitude);
 
     for (const unsigned threads : { 4u, 32u, 0u })
     {
@@ -105,8 +105,8 @@ TEST_CASE("determinism: the inputs of the stored result are themselves the same 
     for (const osc::Area& area : scene::areas())
         for (const osc::Polyline& shape : area.shapes)
             for (const osc::Vec2& p : shape.points)
-                h = osc::hashCombine(h, (static_cast<std::uint64_t>(std::bit_cast<std::uint32_t>(p.x)) << 32)
-                                            | std::bit_cast<std::uint32_t>(p.y));
+                h = osc::hashCombine(h, (static_cast<std::uint64_t>(std::bit_cast<std::uint32_t>(p.x)) << 32) |
+                                            std::bit_cast<std::uint32_t>(p.y));
     CHECK(h == 0xA7BB8BDB3A34B0D0ull);
 }
 
@@ -117,7 +117,7 @@ TEST_CASE("determinism: the hash tells scatters apart")
     const osc::ScatterResult base = osc::scatterPlanar(pattern, s);
     const std::uint64_t hash = osc::hashInstances(base);
 
-    std::size_t tile = 0;   // a block with at least two instances
+    std::size_t tile = 0; // a block with at least two instances
     while (tile < base.tiles.size() && base.tiles[tile].size() < 2)
         ++tile;
     REQUIRE(tile < base.tiles.size());

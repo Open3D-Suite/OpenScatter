@@ -18,11 +18,17 @@ namespace osc
 struct TriMesh
 {
     std::vector<Vec3> vertices;
-    std::vector<std::uint32_t> indices;   // three per triangle
-    std::vector<Vec2> cornerUVs;          // optional: three per triangle, in the order of "indices"
+    std::vector<std::uint32_t> indices; // three per triangle
+    std::vector<Vec2> cornerUVs;        // optional: three per triangle, in the order of "indices"
 
-    std::size_t triangleCount() const { return indices.size() / 3; }
-    bool hasUVs() const { return !indices.empty() && cornerUVs.size() == triangleCount() * 3; }
+    std::size_t triangleCount() const
+    {
+        return indices.size() / 3;
+    }
+    bool hasUVs() const
+    {
+        return !indices.empty() && cornerUVs.size() == triangleCount() * 3;
+    }
 };
 
 } // namespace osc

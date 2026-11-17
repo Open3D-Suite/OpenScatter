@@ -24,7 +24,8 @@ inline float valueNoise(float x, float y, std::uint64_t seed)
     const float tx = x - fx;
     const float ty = y - fy;
     const auto corner = [seed](std::int64_t cx, std::int64_t cy) {
-        return unitFloat(hashCombine(hashCombine(seed, static_cast<std::uint64_t>(cx)), static_cast<std::uint64_t>(cy)));
+        return unitFloat(
+            hashCombine(hashCombine(seed, static_cast<std::uint64_t>(cx)), static_cast<std::uint64_t>(cy)));
     };
     const float sx = tx * tx * (3.0f - 2.0f * tx);
     const float sy = ty * ty * (3.0f - 2.0f * ty);

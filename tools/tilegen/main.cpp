@@ -53,7 +53,7 @@ bool writeSvg(const osc::Pattern& pattern, const std::filesystem::path& path)
     const double radius = 0.25 * std::sqrt(1.0 / (0.8660254 * static_cast<double>(pattern.size())));
     file << "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1 1\" width=\"1024\" height=\"1024\">\n"
          << "<rect width=\"1\" height=\"1\" fill=\"white\"/>\n";
-    for (std::size_t i = pattern.size(); i-- > 0;)   // the first points last, on top
+    for (std::size_t i = pattern.size(); i-- > 0;) // the first points last, on top
     {
         const osc::Vec2& p = pattern.points[i];
         file << "<circle cx=\"" << p.x << "\" cy=\"" << (1.0f - p.y) << "\" r=\"" << radius << "\" fill=\""

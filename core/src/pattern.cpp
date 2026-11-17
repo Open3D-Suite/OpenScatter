@@ -41,7 +41,7 @@ float maxRadius(std::size_t n)
 // A max-heap over a fixed set of items whose keys can only go down.
 class MaxHeap
 {
-public:
+  public:
     MaxHeap(const std::vector<std::int32_t>& items, const std::vector<float>& keys, std::size_t universe)
         : m_heap(items), m_keys(keys), m_pos(universe, -1)
     {
@@ -51,7 +51,10 @@ public:
             siftDown(i);
     }
 
-    bool contains(std::int32_t item) const { return m_pos[static_cast<std::size_t>(item)] >= 0; }
+    bool contains(std::int32_t item) const
+    {
+        return m_pos[static_cast<std::size_t>(item)] >= 0;
+    }
 
     std::int32_t pop()
     {
@@ -75,8 +78,11 @@ public:
             siftDown(static_cast<std::size_t>(pos));
     }
 
-private:
-    float key(std::size_t heapIndex) const { return m_keys[static_cast<std::size_t>(m_heap[heapIndex])]; }
+  private:
+    float key(std::size_t heapIndex) const
+    {
+        return m_keys[static_cast<std::size_t>(m_heap[heapIndex])];
+    }
 
     void siftDown(std::size_t i)
     {
@@ -122,7 +128,7 @@ void eliminate(const std::vector<Vec2>& pts, std::vector<std::int32_t>& active, 
     const float rmax = maxRadius(target);
     const float reach = 2.0f * rmax;
     const float ratio = static_cast<float>(target) / static_cast<float>(n);
-    const float dmin = rmax * (1.0f - ratio * std::sqrt(ratio)) * 0.65f;   // ratio ^ 1.5
+    const float dmin = rmax * (1.0f - ratio * std::sqrt(ratio)) * 0.65f; // ratio ^ 1.5
     const auto weight = [&](float d) {
         d = std::max(d, dmin);
         const float t = 1.0f - d / reach;
@@ -130,7 +136,7 @@ void eliminate(const std::vector<Vec2>& pts, std::vector<std::int32_t>& active, 
             return 0.0f;
         const float t2 = t * t;
         const float t4 = t2 * t2;
-        return t4 * t4;                                                    // t ^ 8
+        return t4 * t4; // t ^ 8
     };
 
     // Every pair of points closer than "reach", through a grid that wraps around (or all pairs when
@@ -214,8 +220,8 @@ void eliminate(const std::vector<Vec2>& pts, std::vector<std::int32_t>& active, 
 
 constexpr char kMagic[8] = { 'O', 'S', 'C', 'P', 'A', 'T', 'R', 'N' };
 constexpr std::uint32_t kFileVersion = 1;
-constexpr std::size_t kHeaderSize = 16;   // magic, version, count
-constexpr std::size_t kFooterSize = 8;    // checksum
+constexpr std::size_t kHeaderSize = 16; // magic, version, count
+constexpr std::size_t kFooterSize = 8;  // checksum
 
 void putU32(std::vector<unsigned char>& out, std::uint32_t v)
 {
@@ -272,7 +278,7 @@ Pattern makeProgressiveBlueNoise(std::size_t count, std::uint64_t seed, std::siz
     for (std::size_t i = 0; i < m; ++i)
         active[i] = static_cast<std::int32_t>(i);
 
-    eliminate(candidates, active, count, nullptr);   // the pattern itself
+    eliminate(candidates, active, count, nullptr); // the pattern itself
 
     // Then halve it again and again, remembering the order in which the points go: the last point
     // removed is the one every prefix needs most, so it gets rank 0.

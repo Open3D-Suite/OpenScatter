@@ -103,7 +103,7 @@ TEST_CASE("surface: height and normal on a tilted plane")
 TEST_CASE("surface: the normal faces up whatever the winding")
 {
     osc::TriMesh mesh = helpers::quad(0.0f, 0.0f, 10.0f, 10.0f, 1.0f);
-    mesh.indices = { 0, 2, 1, 0, 3, 2 };   // facing down
+    mesh.indices = { 0, 2, 1, 0, 3, 2 }; // facing down
     const osc::SurfaceIndex index(mesh);
     osc::SurfaceHit hit;
     REQUIRE(index.project(3.0f, 4.0f, hit));
@@ -133,21 +133,21 @@ TEST_CASE("surface: triangles that cannot be used are left out")
 {
     osc::TriMesh mesh = helpers::quad(0.0f, 0.0f, 10.0f, 10.0f, 2.0f);
     const float nan = std::numeric_limits<float>::quiet_NaN();
-    mesh.vertices.push_back({ 0.0f, 0.0f, 50.0f });   // 4: the foot of a wall
-    mesh.vertices.push_back({ 10.0f, 0.0f, 50.0f });  // 5
-    mesh.vertices.push_back({ 10.0f, 0.0f, 90.0f });  // 6: straight above 5
-    mesh.vertices.push_back({ nan, 5.0f, 99.0f });    // 7
-    mesh.vertices.push_back({ 5.0f, 5.0f, std::numeric_limits<float>::infinity() });   // 8
+    mesh.vertices.push_back({ 0.0f, 0.0f, 50.0f });                                  // 4: the foot of a wall
+    mesh.vertices.push_back({ 10.0f, 0.0f, 50.0f });                                 // 5
+    mesh.vertices.push_back({ 10.0f, 0.0f, 90.0f });                                 // 6: straight above 5
+    mesh.vertices.push_back({ nan, 5.0f, 99.0f });                                   // 7
+    mesh.vertices.push_back({ 5.0f, 5.0f, std::numeric_limits<float>::infinity() }); // 8
     const std::uint32_t extra[] = {
-        4, 5, 6,          // a vertical wall: a line seen from above
-        0, 1, 999,        // an index out of range
-        0, 1, 7,          // a vertex that is not a number
-        0, 2, 8,          // a vertex at infinity
-        3, 3, 3,          // a point
-        0, 2, 0,          // a line
+        4, 5, 6,   // a vertical wall: a line seen from above
+        0, 1, 999, // an index out of range
+        0, 1, 7,   // a vertex that is not a number
+        0, 2, 8,   // a vertex at infinity
+        3, 3, 3,   // a point
+        0, 2, 0,   // a line
     };
     mesh.indices.insert(mesh.indices.end(), std::begin(extra), std::end(extra));
-    mesh.indices.push_back(1);   // and a stray index that does not make a triangle
+    mesh.indices.push_back(1); // and a stray index that does not make a triangle
 
     const osc::SurfaceIndex index(mesh);
     CHECK(index.usableTriangles() == 2);
@@ -250,13 +250,13 @@ TEST_CASE("surface: no holes along the edges and at the vertices of the mesh")
         {
             const float vx = size * static_cast<float>(x) / static_cast<float>(resolution);
             const float vy = size * static_cast<float>(y) / static_cast<float>(resolution);
-            CHECK(index.project(vx, vy, hit));                                   // a vertex
+            CHECK(index.project(vx, vy, hit)); // a vertex
             if (x < resolution)
-                CHECK(index.project(vx + step * 0.5f, vy, hit));                 // the middle of an edge
+                CHECK(index.project(vx + step * 0.5f, vy, hit)); // the middle of an edge
             if (y < resolution)
                 CHECK(index.project(vx, vy + step * 0.5f, hit));
             if (x < resolution && y < resolution)
-                CHECK(index.project(vx + step * 0.5f, vy + step * 0.5f, hit));   // on the diagonal
+                CHECK(index.project(vx + step * 0.5f, vy + step * 0.5f, hit)); // on the diagonal
         }
 }
 

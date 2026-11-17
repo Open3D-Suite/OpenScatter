@@ -22,12 +22,18 @@ namespace osc
 
 struct Pattern
 {
-    std::vector<Vec2> points;   // in rank order, each coordinate in [0, 1)
-    std::uint64_t id = 0;       // identifies the pattern in instance ids; the generator and the loader
-                                // set it to hashPattern(), so equal patterns have equal ids
+    std::vector<Vec2> points; // in rank order, each coordinate in [0, 1)
+    std::uint64_t id = 0;     // identifies the pattern in instance ids; the generator and the loader
+                              // set it to hashPattern(), so equal patterns have equal ids
 
-    std::size_t size() const { return points.size(); }
-    bool empty() const { return points.empty(); }
+    std::size_t size() const
+    {
+        return points.size();
+    }
+    bool empty() const
+    {
+        return points.empty();
+    }
 };
 
 // The largest pattern the generator and the loader accept.
