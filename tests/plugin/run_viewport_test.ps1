@@ -39,8 +39,12 @@ if (Test-Path $plugins) { Remove-Item -Recurse -Force $plugins }
 New-Item -ItemType Directory -Force $plugins | Out-Null
 Copy-Item -Recurse $Bundle (Join-Path $plugins "OpenScatter.bundle")
 
-# \\localhost\C$ and not %LOCALAPPDATA%: a shell started by a packaged app may see a redirected AppData.
-$userDir = "\\localhost\C$\Users\$env:USERNAME\AppData\Local\Autodesk\3dsMax\2027 - 64bit\ENU"
+# The user's settings folder, read through the administrative share of its drive (\\localhost\<drive>$)
+# and not straight from %LOCALAPPDATA%: a shell started by a packaged app may see a redirected AppData,
+# and the share shows the real one. Where the share cannot be reached, the direct path is used.
+$userDir = Join-Path $env:LOCALAPPDATA "Autodesk\3dsMax\2027 - 64bit\ENU"
+$shared = "\\localhost\" + ($userDir -replace '^([A-Za-z]):', '$1$$')
+if ([System.IO.File]::Exists((Join-Path $shared "3dsMax.ini"))) { $userDir = $shared }
 $userIni = Join-Path $userDir "3dsMax.ini"
 if (-not (Test-Path $userIni)) { throw "The user's 3dsMax.ini was not found at $userIni" }
 $altIni = Join-Path $Work "3dsMax_viewport_$Driver.ini"
