@@ -16,7 +16,7 @@
 param(
     [string[]]$Only = @(),
     [string]$Bundle = "",
-    [string]$Work = "C:\dev\tmp\osc_plugin_test",
+    [string]$Work = (Join-Path ([System.IO.Path]::GetTempPath()) "osc_plugin_test"),
     [string]$MaxRoot = "C:\Program Files\Autodesk\3ds Max 2027",
     [int]$TimeoutSeconds = 900
 )
