@@ -38,10 +38,21 @@ as a change that makes it old.
 
 - The version is `project(OpenScatter VERSION X.Y.Z)` in `CMakeLists.txt`, which stamps the `.dlo`;
   `tools/repo.toml` lists its copies, and `python -I tools/repo.py version set X.Y.Z` writes them all.
-  `build.ps1 -Plugin` also refuses a mismatch with `PackageContents.xml`. The CHANGELOG is by hand.
-- `python tools/package.py` runs `build.ps1 -Plugin` and writes `dist/OpenScatter.bundle` with `LICENSE`
-  and `NOTICE` in it; `--zip` adds `dist/openscatter-<version>-windows-x64-3dsmax.zip`.
+  `build.ps1 -Plugin` also refuses a mismatch with `PackageContents.xml`. The CHANGELOG is by hand:
+  what a user can notice goes under `## In development`, in the same commit.
+- `python -I tools/repo.py package` makes the release package as the `[package]` table of
+  `tools/repo.toml` says: it needs the version's `## X.Y.Z` section in `CHANGELOG.md`, runs the quick
+  checks, then `tools/package.py` (`build.ps1 -Plugin`, then `dist/OpenScatter.bundle` with the `.dlo`,
+  `LICENSE` and `NOTICE` in it), and writes `dist/openscatter-<version>-windows-x64-3dsmax.zip`, with
+  that folder at its root, and `dist/SHA256SUMS.txt`. It refuses a file that names this computer and a
+  bundle whose `AppVersion` is not the version. `tools/package.py --zip` still writes a zip of its own.
+- `python -I tools/repo.py release X.Y.Z` turns `## In development` into `## X.Y.Z — <date>`, sets the
+  version, commits `Release X.Y.Z`, packages, tags `vX.Y.Z` and prints the pushes to approve; run again
+  once they are done, it packages again and makes the GitHub release as a draft. It never pushes.
+  `--dry-run` tries it all and writes only to `dist/`; it builds in a copy of the repo inside `dist/`,
+  which has no `build.local.ps1`: the SDK then comes only from `ADSK_3DSMAX_SDK_2027`.
 - The Open3D launcher needs `OpenScatter.bundle` at the zip's root, with the release's version in its XML.
+  Its publishing script still makes this repo's zip its own way, from the latest `vX.Y.Z` tag.
 
 ## Rules of this code
 

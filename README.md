@@ -209,8 +209,10 @@ variable the SDK's installer sets. The result is `build\release\bundle\OpenScatt
 Nothing is installed: to use the bundle, copy that folder into
 `%APPDATA%\Autodesk\ApplicationPlugins` and start 3ds Max; to remove it, delete the folder.
 
-`python tools/package.py` does that build and writes the package a release carries to `dist\`:
-`OpenScatter.bundle` with the licence texts in it and, with `--zip`, the zip of that folder.
+`python -I tools/repo.py package` makes the package a release carries. It needs the version's
+section in `CHANGELOG.md`, runs the checks, then `tools/package.py`, which does that build and puts
+`dist\OpenScatter.bundle` together with the licence texts in it, and writes that folder zipped,
+`dist\openscatter-<version>-windows-x64-3dsmax.zip`, and `dist\SHA256SUMS.txt`.
 
 ## Tests
 

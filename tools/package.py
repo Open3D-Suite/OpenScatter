@@ -13,8 +13,9 @@ The SDK's "maxsdk" folder comes from --max-sdk, else from where build.ps1 looks 
 build.local.ps1, then the ADSK_3DSMAX_SDK_2027 environment variable. Plain Python 3, nothing to
 install.
 
-The Open3D launcher's publishing script runs this file in a clean export of a release tag and zips
-dist/OpenScatter.bundle itself.
+`python -I tools/repo.py package` runs this file as its build step and zips dist/OpenScatter.bundle
+itself (tools/repo.toml); so does the Open3D launcher's publishing script, in a clean export of a
+release tag.
 """
 
 import argparse

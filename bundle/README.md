@@ -20,7 +20,7 @@ into the file properties of the `.dlo`, and twice in `PackageContents.xml`; the 
 put a bundle together when they disagree.
 
 `tools/package.py` makes the package a release carries from it: `dist\OpenScatter.bundle`, the
-same folder with `LICENSE` and `NOTICE` added.
+same folder with `LICENSE` and `NOTICE` added, which `python -I tools/repo.py package` zips.
 
 To use a bundle, copy the `OpenScatter.bundle` folder into an ApplicationPlugins folder
 (`%APPDATA%\Autodesk\ApplicationPlugins` for one user) and start 3ds Max. To try one without

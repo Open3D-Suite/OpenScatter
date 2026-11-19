@@ -1,5 +1,6 @@
 # What the common OPEN3D tools need to know about this repository. tools/repo.py reads it:
-# tools/check.ps1 runs the checks, and "python -I tools/repo.py version set X.Y.Z" writes a new version.
+# tools/check.ps1 runs the checks, "python -I tools/repo.py version set X.Y.Z" writes a new version,
+# "python -I tools/repo.py package" makes the release package and "release X.Y.Z" the release.
 
 # Where the version lives (`source`) and the other places that repeat it. Each one is a file and a
 # pattern whose one group is the version, or one number of it (`part`); "^" is the start of a line.
@@ -50,3 +51,13 @@ full = true
 name = "plugin tests"
 run = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "tests/plugin/run_plugin_tests.ps1"]
 full = true
+
+# The release package: dist/openscatter-<version>-windows-x64-3dsmax.zip, with OpenScatter.bundle at its
+# root, and dist/SHA256SUMS.txt. The launcher installs it from there. tools/package.py builds the plugin
+# (build.ps1 -Plugin, which needs the 3ds Max 2027 SDK) and puts the bundle together in dist/, with the
+# .dlo, LICENSE and NOTICE in it.
+[package]
+name = "OpenScatter"
+bundle = "OpenScatter.bundle"
+build = [["python", "tools/package.py"]]
+files = [{ from = "dist/OpenScatter.bundle", to = "OpenScatter.bundle" }]
