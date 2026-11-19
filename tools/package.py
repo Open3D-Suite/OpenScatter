@@ -14,8 +14,7 @@ build.local.ps1, then the ADSK_3DSMAX_SDK_2027 environment variable. Plain Pytho
 install.
 
 `python -I tools/repo.py package` runs this file as its build step and zips dist/OpenScatter.bundle
-itself (tools/repo.toml); so does the Open3D launcher's publishing script, in a clean export of a
-release tag.
+itself (tools/repo.toml).
 """
 
 import argparse

@@ -55,7 +55,6 @@ as a change that makes it old.
   `--dry-run` tries it all and writes only to `dist/`; it builds in a copy of the repo inside `dist/`,
   which has no `build.local.ps1`: the SDK then comes only from `ADSK_3DSMAX_SDK_2027`.
 - The Open3D launcher needs `OpenScatter.bundle` at the zip's root, with the release's version in its XML.
-  Its publishing script still makes this repo's zip its own way, from the latest `vX.Y.Z` tag.
 
 ## Rules of this code
 
