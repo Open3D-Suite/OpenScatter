@@ -13,7 +13,7 @@ as a change that makes it old.
   ids, parameter ids, the instance buffer. `scatter_object.cpp`: the object. `render_instancing.cpp`,
   `pflow_operator.cpp` with `carrier.cpp`, `render_mesh.cpp`: the three render routes. `viewport.cpp`.
 - `tests/core/`: the engine's tests (doctest). `tests/plugin/`: the plugin's. `docs/ARCHITECTURE.md`: design.
-- `bundle/`: the bundle's `PackageContents.xml`. `tools/`: `tilegen`, `bench` and `package.py`, the packager.
+- `bundle/`: the bundle's `PackageContents.xml`. `tools/`: `tilegen`, `bench`, `package.py` and the checks.
 
 ## Build and check
 
@@ -23,19 +23,22 @@ as a change that makes it old.
   needs the 3ds Max 2027 SDK and refuses `-Config Debug`. Nothing is installed.
 - The build goes to `build\<config>`, or under `$BuildRoot` when the ignored local file `build.local.ps1`
   sets it. The SDK comes from `-MaxSdk`, else `$MaxSdk` in that file, else `ADSK_3DSMAX_SDK_2027`.
-- Checks, all of which must pass:
+- Checks: `tools\check.ps1` runs the quick ones, `-Full` all; all must pass. It needs Python 3.11 or newer
+  and the ruff `ruff.toml` names. Its own steps (the version agrees, every source outside `third_party/`
+  has its licence line, no file holds a path of somebody's computer), then those of `tools/repo.toml`:
   - `clang-format --dry-run -Werror` on the tracked `.cpp` and `.h` files. There is no C++ lint.
+  - `ruff format --check .` and `ruff check .`, for the Python in `tools/`
   - `build.ps1`, which runs `osc_core_tests` (76 tests; none needs 3ds Max)
-  - `powershell -ExecutionPolicy Bypass -File tests\plugin\run_plugin_tests.ps1` after a `-Plugin` build
-    (5 tests in `3dsmaxbatch`; they need 3ds Max 2027, Arnold and Corona). `-Only <tests>` runs some.
-  - `ruff format --check .` and `ruff check .`, for `tools/package.py`
-- `.editorconfig`, `.gitattributes` and `ruff.toml` are common to every Open3D repo. Do not change them here.
+  - only with `-Full`: `build.ps1 -Plugin`, then `tests\plugin\run_plugin_tests.ps1` (5 tests in
+    `3dsmaxbatch`; they need 3ds Max 2027, Arnold and Corona). `-Only <tests>` runs some.
+- `.editorconfig`, `.gitattributes`, `ruff.toml`, `LICENSE`, `tools/check.ps1` and `tools/repo.py` are
+  the same in every Open3D repo. Do not change them here.
 
 ## Version and release
 
-- The version is in `CMakeLists.txt`, which stamps it into the `.dlo`, and twice in `PackageContents.xml`;
-  `build.ps1 -Plugin` refuses a mismatch. Nothing here checks the other copies: the README, the CHANGELOG,
-  `OPENSCATTER_VERSION_STRING` in `plugin/src/plugin.h` and the numbers in `core/include/osc/version.h`.
+- The version is `project(OpenScatter VERSION X.Y.Z)` in `CMakeLists.txt`, which stamps the `.dlo`;
+  `tools/repo.toml` lists its copies, and `python -I tools/repo.py version set X.Y.Z` writes them all.
+  `build.ps1 -Plugin` also refuses a mismatch with `PackageContents.xml`. The CHANGELOG is by hand.
 - `python tools/package.py` runs `build.ps1 -Plugin` and writes `dist/OpenScatter.bundle` with `LICENSE`
   and `NOTICE` in it; `--zip` adds `dist/openscatter-<version>-windows-x64-3dsmax.zip`.
 - The Open3D launcher needs `OpenScatter.bundle` at the zip's root, with the release's version in its XML.

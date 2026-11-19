@@ -214,6 +214,17 @@ Nothing is installed: to use the bundle, copy that folder into
 
 ## Tests
 
+One command runs the checks: the version and the licence lines, the formatting of the C++ and the
+Python, ruff's lints, the build and the engine's tests. With `-Full` it also builds the plugin and
+runs its tests in `3dsmaxbatch`. It needs Python 3.11 or newer and ruff 0.17.5:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools\check.ps1
+powershell -ExecutionPolicy Bypass -File tools\check.ps1 -Full
+```
+
+The tests, one by one:
+
 - The engine: `osc_core_tests`, run by `build.ps1`. No 3ds Max needed.
 - The plugin: [`tests/plugin`](tests/plugin). They need 3ds Max 2027, and Arnold and Corona for
   the render tests. They run in their own `3dsmaxbatch` processes with the bundle loaded from a

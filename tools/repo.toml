@@ -1,0 +1,52 @@
+# What the common OPEN3D tools need to know about this repository. tools/repo.py reads it:
+# tools/check.ps1 runs the checks, and "python -I tools/repo.py version set X.Y.Z" writes a new version.
+
+# Where the version lives (`source`) and the other places that repeat it. Each one is a file and a
+# pattern whose one group is the version, or one number of it (`part`); "^" is the start of a line.
+# kAlgorithmVersion in version.h is not the version of the program: it changes on its own.
+[version]
+source = { file = "CMakeLists.txt", pattern = '^project\(OpenScatter VERSION (\d+\.\d+\.\d+)' }
+places = [
+    { file = "bundle/OpenScatter.bundle/PackageContents.xml", pattern = '(?:AppVersion| Version)="([^"]+)"' },
+    { file = "core/include/osc/version.h", pattern = 'kVersionMajor = (\d+);', part = "major" },
+    { file = "core/include/osc/version.h", pattern = 'kVersionMinor = (\d+);', part = "minor" },
+    { file = "core/include/osc/version.h", pattern = 'kVersionPatch = (\d+);', part = "patch" },
+    { file = "plugin/src/plugin.h", pattern = 'OPENSCATTER_VERSION_STRING "([^"]+)"' },
+    { file = "README.md", pattern = '^\*\*Version (\d+\.\d+\.\d+)' },
+]
+
+# Doctest is third-party code: it keeps its own licence.
+[licence_header]
+exclude = ["third_party"]
+
+# The checks, in the order they run. `full = true` marks the ones that only tools/check.ps1 -Full runs.
+# .clang-format-ignore keeps clang-format off doctest.
+[[check]]
+name = "clang-format"
+run = ["clang-format", "--dry-run", "-Werror"]
+files = ["*.cpp", "*.h"]
+
+[[check]]
+name = "ruff format"
+run = ["ruff", "format", "--check", "."]
+
+[[check]]
+name = "ruff check"
+run = ["ruff", "check", "."]
+
+# The engine, its tools and its tests (osc_core_tests); no 3ds Max needed.
+[[check]]
+name = "build and engine tests"
+run = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "build.ps1"]
+
+# The plugin and its bundle: needs the 3ds Max 2027 SDK.
+[[check]]
+name = "plugin build"
+run = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "build.ps1", "-Plugin"]
+full = true
+
+# The five plugin tests, each in a 3dsmaxbatch of its own: needs 3ds Max 2027, Arnold and Corona.
+[[check]]
+name = "plugin tests"
+run = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "tests/plugin/run_plugin_tests.ps1"]
+full = true
