@@ -31,6 +31,9 @@ as a change that makes it old.
   - `build.ps1`, which runs `osc_core_tests` (76 tests; none needs 3ds Max)
   - only with `-Full`: `build.ps1 -Plugin`, then `tests\plugin\run_plugin_tests.ps1` (5 tests in
     `3dsmaxbatch`; they need 3ds Max 2027, Arnold and Corona). `-Only <tests>` runs some.
+- CI: `.github/workflows/check.yml` runs `tools\check.ps1`, without `-Full`, on every push and pull request
+  to `main`, on GitHub's Windows runner with Python 3.14: the engine only, with the runner's clang-format
+  and Visual Studio.
 - `.editorconfig`, `.gitattributes`, `ruff.toml`, `LICENSE`, `tools/check.ps1` and `tools/repo.py` are
   the same in every Open3D repo. Do not change them here.
 
