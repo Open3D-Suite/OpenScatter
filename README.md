@@ -2,7 +2,7 @@
 
 A scatter for 3ds Max: one procedural object that places millions of instances on surfaces – grass,
 trees, stones, anything – and hands them to the renderer as real instances, without creating
-nodes. Part of the [Open3D](https://github.com/Open3D-Suite/Open3D) suite of open-source tools
+nodes. Part of the [Open3D](https://github.com/Open3D-Suite/Open3D-Launcher) suite of open-source tools
 for 3D work.
 
 **Version 0.1.0 is the first release, and an early one.** OpenScatter is being built from its
@@ -15,7 +15,7 @@ it has **not been tested in V-Ray**.
 
 OpenScatter needs **3ds Max 2027** on Windows, the version it is built for and tested on.
 
-The easy way: install the [Open3D Launcher](https://github.com/Open3D-Suite/Open3D/releases/latest)
+The easy way: install the [Open3D Launcher](https://github.com/Open3D-Suite/Open3D-Launcher/releases/latest)
 and click **Install** next to OpenScatter, with 3ds Max closed. It puts OpenScatter in
 `%APPDATA%\Autodesk\ApplicationPlugins` as a plug-in bundle, tells you when a new version is out
 and updates it. To uninstall, choose **Uninstall…** in OpenScatter's menu in the launcher.
