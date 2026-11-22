@@ -58,6 +58,8 @@ as a change that makes it old.
 
 ## Rules of this code
 
+- A bug that is fixed comes with a test that fails without the fix, and new logic comes with its tests.
+  The plugin is tried by hand in 3ds Max before a release.
 - Determinism is a contract: the same settings give the same instances on any machine and thread count.
   The tests hold stored hashes; moving one needs a new `kAlgorithmVersion`. Sines and cosines come from
   `osc/detmath.h`, never the C library; random values are hashes (`osc/hash.h`); no fast-math, no FMA.
