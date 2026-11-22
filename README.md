@@ -13,7 +13,7 @@ it has **not been tested in V-Ray**.
 
 ## Install
 
-OpenScatter needs **3ds Max 2027** on Windows.
+OpenScatter needs **3ds Max 2027** on Windows, the version it is built for and tested on.
 
 The easy way: install the [Open3D Launcher](https://github.com/carlesllavata/Open3D/releases/latest)
 and click **Install** next to OpenScatter, with 3ds Max closed. It puts OpenScatter in
